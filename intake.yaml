@@ -1,0 +1,14 @@
+project:
+  name: TeleVantage Churn Intelligence Platform
+  type: webapp
+  description: Full-stack web application template
+requirements:
+  functional:
+  - User authentication and authorization
+  - Responsive UI for desktop and mobile
+  - RESTful API with {{FEATURES}}
+  technical:
+  - 'Frontend: React/Vue/Angular'
+  - 'Backend: FastAPI/Flask/Node.js'
+  - 'Database: PostgreSQL/MongoDB'
+  - Deploy to cloud (AWS/GCP/Azure)
