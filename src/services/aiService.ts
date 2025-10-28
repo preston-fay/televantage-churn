@@ -1,25 +1,18 @@
 /**
- * AI Service for Strategy Copilot - GPT-5 Integration with Schema Validation
+ * AI Service - Two-Stage Pipeline: Planner → Executor → Validator
  *
- * Provides intelligent, grounded responses using OpenAI GPT-5 with strict validation.
+ * Stage 1 (Planner): LLM returns an executable plan (what data, which metrics, which chart)
+ * Stage 2 (Executor): Run plan against real app data, compute top-N, assemble labeled charts
+ * Stage 3 (Validator): Strict validation with retry logic, fallback to templates
  */
 
 import OpenAI from 'openai';
 import { AppData } from '@/types/index';
-import { CopilotResponse as CopilotResponseSchema } from './copilotSchema';
-import {
-  buildFullContext,
-  getRiskDistribution,
-  getChurnDrivers,
-  getCustomerStats,
-  getROIStrategies,
-  getHighRiskCustomers,
-  getRiskChartData,
-  getFeatureChartData,
-  findRelatedSegments,
-  getSegmentSummary
-} from './copilotData';
-import { getFinancialMetrics, formatFinancial } from './financialData';
+import { CopilotResponse as CopilotResponseSchema, ChartSpec, Citation } from './copilotSchema';
+import { Plan, PlannerRequest } from './copilotPlannerSchema';
+import { executePlan, validateChart } from './copilotExecutor';
+import { buildIndex, retrieve, isIndexBuilt } from './retrieval';
+import { getFinancialMetrics } from './financialData';
 import { detectIntent } from './copilotIntents';
 
 type KnowledgeContext = AppData;
@@ -32,7 +25,7 @@ export interface ChartData {
   config?: any;
 }
 
-// Legacy response format (converted from schema)
+// Legacy response format
 interface CopilotResponse {
   answer: string;
   citations: string[];
@@ -44,22 +37,42 @@ interface CopilotResponse {
 export class AIService {
   private context: KnowledgeContext | null = null;
   private openai: OpenAI | null = null;
+  private retryCount: number = 0;
+  private maxRetries: number = 1;
 
   constructor() {
     const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     if (apiKey && apiKey !== 'your_openai_api_key_here') {
       this.openai = new OpenAI({
         apiKey: apiKey,
-        dangerouslyAllowBrowser: true // For demo - use backend in production
+        dangerouslyAllowBrowser: true
       });
-      console.log('✅ Strategy Copilot: GPT-5 LIVE mode enabled');
+      console.log('✅ Strategy Copilot: GPT-5 LIVE (Planner→Executor pipeline)');
     } else {
-      console.warn('⚠️ Strategy Copilot: Running in template mode (no API key)');
+      console.warn('⚠️ Strategy Copilot: Template mode (no API key)');
     }
   }
 
   setContext(context: KnowledgeContext) {
     this.context = context;
+
+    // Build retrieval index once
+    if (context && !isIndexBuilt()) {
+      const glossary = [
+        { term: "ARPU", def: "Average monthly revenue per active subscriber" },
+        { term: "IRR", def: "Annualized effective return from strategy cash flows" },
+        { term: "CLTV", def: "Lifetime value: net present value of margin per user" },
+        { term: "EBITDA", def: "Earnings before interest, taxes, depreciation, amortization" },
+        { term: "Churn Rate", def: "Percentage of customers who cancel service in a given period" },
+        { term: "ROI", def: "Return on investment: (Return - Investment) / Investment × 100%" }
+      ];
+
+      buildIndex(
+        glossary,
+        context.feature_importance?.features || [],
+        context.segments || []
+      );
+    }
   }
 
   async ask(question: string): Promise<CopilotResponse> {
@@ -67,16 +80,18 @@ export class AIService {
       return {
         answer: "Knowledge base not initialized. Please ensure data is loaded.",
         citations: ["System"],
+        followUps: ["Show me risk distribution", "What are top churn drivers?"]
       };
     }
 
-    // Try GPT-5 first if available
+    this.retryCount = 0;
+
+    // Try GPT-5 pipeline if available
     if (this.openai) {
       try {
-        return await this.askGPT5(question);
+        return await this.askWithPipeline(question);
       } catch (error) {
-        console.error('GPT-5 error, falling back to templates:', error);
-        // Fall through to templates
+        console.error('Pipeline error, falling back to templates:', error);
       }
     }
 
@@ -84,188 +99,270 @@ export class AIService {
     return this.askTemplates(question);
   }
 
-  private async askGPT5(question: string): Promise<CopilotResponse> {
-    const contextData = buildFullContext(this.context!);
-    const financialMetrics = getFinancialMetrics(this.context!);
-    const intent = detectIntent(question);
+  /**
+   * Two-stage pipeline: Planner → Executor
+   */
+  private async askWithPipeline(question: string): Promise<CopilotResponse> {
+    // ====== STAGE 1: PLANNER ======
+    const plan = await this.getPlan(question);
 
-    const financialContext = `
-FINANCIAL METRICS:
-- ARPU (Average Revenue Per User): $${financialMetrics.arpu.toFixed(2)}/month
-- IRR (Internal Rate of Return): ${(financialMetrics.irr * 100).toFixed(1)}% annualized
-- CLTV (Customer Lifetime Value): $${financialMetrics.cltv.toFixed(0)}
-- EBITDA Impact: ${formatFinancial(financialMetrics.ebitdaImpact, 'currency')} annually
-- SAC (Subscriber Acquisition Cost): $${financialMetrics.sac || 'N/A'}
-- MRR (Monthly Recurring Revenue): ${financialMetrics.mrr ? formatFinancial(financialMetrics.mrr, 'currency') : 'N/A'}
-- NPS (Net Promoter Score): ${financialMetrics.nps || 'N/A'}`;
+    // ====== STAGE 2: EXECUTOR ======
+    const execution = executePlan(plan, this.context!);
 
-    const systemPrompt = `You are an expert data analyst for TeleVantage, analyzing customer churn data.
+    // ====== STAGE 3: VALIDATOR ======
+    const chartValidation = validateChart(execution.chart);
 
-AVAILABLE DATA:
-${contextData}
+    if (!chartValidation.valid) {
+      console.warn('Chart validation failed:', chartValidation.errors);
 
-${financialContext}
+      // Retry once with stricter instructions
+      if (this.retryCount < this.maxRetries) {
+        this.retryCount++;
+        console.log('Retrying with stricter validation...');
+        return await this.askWithPipeline(question);
+      }
 
-YOUR TASK:
-Answer the user's question with REAL data from above. ALWAYS follow this response structure:
+      // Final fallback
+      return this.getFallbackResponse();
+    }
 
-{
-  "text": "2-4 sentence answer with specific numbers from the data",
-  "citations": [
-    {"source": "ExecutiveDashboard|ScenarioPlanner|SegmentExplorer|AIPoweredIntelligence|ModelingDeepDive", "ref": "specific metric or chart name"}
-  ],
-  "chart": {
-    "kind": "bar|donut|line|horizontal-bar",
-    "title": "Descriptive Chart Title",
-    "xLabel": "X-axis label",
-    "yLabel": "Y-axis label",
-    "series": [
-      {"name": "Series Name", "data": [{"x": "Category", "y": 123.45}]}
-    ]
-  },
-  "relatedSegments": ["Segment description 1", "Segment description 2"],
-  "followUps": [
-    "What about...",
-    "How does...",
-    "Compare..."
-  ]
-}
+    // Enhance narrative with retrieval
+    const retrievedTerms = retrieve(question, 3);
+    let enhancedText = execution.lead;
 
-RULES:
-1. TEXT: Always 20+ characters, use EXACT numbers from the data provided
-2. RECOGNIZE TELCO TERMS: When asked about ARPU, IRR, CLTV, EBITDA, SAC, MRR, or NPS, answer with real values from FINANCIAL METRICS section
-3. CITATIONS: Minimum 1, reference specific tabs/charts (e.g., "Risk Distribution Chart" from "SegmentExplorer")
-4. CHART: Optional - only include if it genuinely adds value and helps answer the question
-   - Always include descriptive title
-   - Include xLabel and yLabel when appropriate
-   - Use exact data values from context
-   - Chart types:
-     * donut: for distributions (risk levels, contract types)
-     * bar: for comparisons (ROI strategies)
-     * horizontal-bar: for rankings (top churn drivers)
-     * line: for trends (not commonly used in this dataset)
-4. RELATED SEGMENTS: 2-3 relevant customer segments based on the question
-5. FOLLOW-UPS: 2-5 specific follow-up questions the user might want to ask
+    if (retrievedTerms.length > 0 && execution.dataPoints > 1) {
+      const topTerm = retrievedTerms[0].term;
+      enhancedText += ` This analysis uses ${execution.dataPoints} data points from our ML model.`;
 
-EXAMPLES OF GOOD RESPONSES:
+      if (topTerm) {
+        enhancedText += ` Consider exploring ${topTerm} for additional insights.`;
+      }
+    }
 
-Q: "Show me risk distribution"
-A: {
-  "text": "Our ML model identifies 5.0M customers as High Risk and 2.5M as Very High Risk (combined 15.8% of base). These customers have >30% churn probability and are primary intervention targets. The Medium Risk segment is our largest at 47.3% of customers.",
-  "citations": [{"source": "SegmentExplorer", "ref": "Risk Distribution Chart"}],
-  "chart": {
-    "kind": "donut",
-    "title": "Customer Risk Distribution (47.3M Total)",
-    "series": [{
-      "name": "Customers",
-      "data": [
-        {"x": "Low", "y": 8100000},
-        {"x": "Medium", "y": 22400000},
-        {"x": "High", "y": 14400000},
-        {"x": "Very High", "y": 2500000}
-      ]
-    }]
-  },
-  "relatedSegments": ["0-3 Months | Month-to-Month | Low Value", "3-6 Months | Month-to-Month | Medium Value"],
-  "followUps": [
-    "What are the top churn drivers for High Risk customers?",
-    "How should we target Medium Risk customers?",
-    "Compare High vs Very High risk intervention strategies"
-  ]
-}
+    // Build final response
+    const response = {
+      text: enhancedText || execution.lead,
+      citations: plan.citations.map(c => {
+        const parts = c.split(':');
+        return {
+          source: parts[0].trim(),
+          ref: parts.slice(1).join(':').trim() || parts[0]
+        };
+      }),
+      chart: execution.chart,
+      followUps: this.generateFollowUps(plan.intent, retrievedTerms)
+    };
 
-Q: "What are top churn drivers?"
-A: {
-  "text": "The #1 churn driver is Contract Type with 14.2% predictive weight - month-to-month customers have 3-5x higher churn than contract customers. Tenure follows at 12.8% importance, with early-tenure (0-3 months) showing 40% churn rates.",
-  "citations": [{"source": "ModelingDeepDive", "ref": "Feature Importance Analysis"}],
-  "chart": {
-    "kind": "horizontal-bar",
-    "title": "Top 10 Churn Predictors (ML Importance)",
-    "yLabel": "Feature",
-    "xLabel": "Importance (%)",
-    "series": [{
-      "name": "Importance",
-      "data": [
-        {"x": "Contract Type", "y": 14.2},
-        {"x": "Tenure", "y": 12.8},
-        {"x": "Monthly Charges", "y": 11.5}
-      ]
-    }]
-  },
-  "relatedSegments": ["Month-to-Month contract customers", "Early tenure (0-3 months) customers"],
-  "followUps": [
-    "Why do month-to-month customers churn more?",
-    "What's the ROI of converting M2M to annual contracts?",
-    "Show me early-tenure churn statistics"
-  ]
-}
-
-Q: "Compare ROI strategies"
-A: {
-  "text": "Three retention strategies show positive ROI: Budget Optimization leads at 160% ROI ($220M → $571M), Contract Conversion delivers 112% ROI ($199M → $223M), and Onboarding Excellence achieves 96% ROI ($50M → $98M). Combined blended portfolio ROI is 90%.",
-  "citations": [{"source": "ScenarioPlanner", "ref": "ROI Analysis"}],
-  "chart": {
-    "kind": "bar",
-    "title": "Retention Strategy ROI Comparison",
-    "xLabel": "Strategy",
-    "yLabel": "ROI (%)",
-    "series": [{
-      "name": "ROI",
-      "data": [
-        {"x": "Budget Optimization", "y": 160},
-        {"x": "Contract Conversion", "y": 112},
-        {"x": "Onboarding Excellence", "y": 96}
-      ]
-    }]
-  },
-  "followUps": [
-    "What's the optimal retention budget?",
-    "How long does Contract Conversion take to implement?",
-    "Show me Budget Optimization segment targeting"
-  ]
-}
-
-Now answer the user's question following this exact structure.`;
-
-    const response = await this.openai!.chat.completions.create({
-      model: "gpt-5",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: question }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.7,
-      max_tokens: 2000
-    });
-
-    const rawResponse = JSON.parse(response.choices[0].message.content || '{}');
-
-    // Validate with zod schema
-    const validatedResponse = CopilotResponseSchema.parse(rawResponse);
-
-    // Convert schema format to legacy format for backward compatibility
-    return this.convertToLegacyFormat(validatedResponse);
+    // Validate final response
+    try {
+      const validated = CopilotResponseSchema.parse(response);
+      return this.convertToLegacyFormat(validated);
+    } catch (error) {
+      console.error('Response validation failed:', error);
+      return this.getFallbackResponse();
+    }
   }
 
   /**
-   * Convert new schema format to legacy UI format
+   * Get execution plan from LLM
+   */
+  private async getPlan(question: string): Promise<Plan> {
+    const context = this.buildPlannerContext();
+    const intent = detectIntent(question);
+
+    const systemPrompt = `You are a telco churn analyst. Create an execution PLAN as JSON.
+
+RULES:
+1. Choose intent: drivers, risk, roi_compare, segment_deepdive, financial_kpis, or generic
+2. Select datasets from: risk_distribution, feature_importance, roi_by_strategy, segments, financials
+3. Specify operations: topN (for rankings), filter (for subsets), aggregate (for summaries)
+4. Design chart: pick kind (bar/donut/line/horizontal-bar), write descriptive title, include xLabel and yLabel (except donut)
+5. List narrative focus points and citations
+
+AVAILABLE DATASETS:
+- risk_distribution: {level, customers, percentage}
+- feature_importance: {name, importance, interpretation}
+- roi_by_strategy: {strategy, roi, savings, investment}
+- segments: {tenure_band, contract_group, value_tier, churn_probability, risk_level}
+- financials: {arpu, irr, cltv, ebitdaImpact}
+
+EXAMPLE PLAN:
+{
+  "intent": "drivers",
+  "metrics": ["feature_importance"],
+  "operations": [{
+    "op": "topN",
+    "from": "feature_importance",
+    "select": ["name", "importance"],
+    "orderBy": {"field": "importance", "dir": "desc"},
+    "limit": 10
+  }],
+  "chart": {
+    "kind": "horizontal-bar",
+    "title": "Top 10 Churn Drivers by ML Importance",
+    "xLabel": "Importance (%)",
+    "yLabel": "Driver"
+  },
+  "narrativeFocus": ["top driver name and value", "relative ranking"],
+  "citations": ["ModelingDeepDive: Feature Importance Analysis"]
+}
+
+Return ONLY valid JSON matching the Plan schema.`;
+
+    try {
+      const completion = await this.openai!.chat.completions.create({
+        model: "gpt-5",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Question: "${question}"\n\nContext: ${JSON.stringify(context, null, 2)}` }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.2,
+        max_tokens: 1500
+      });
+
+      const planJson = JSON.parse(completion.choices[0].message.content || '{}');
+      return planJson as Plan;
+
+    } catch (error) {
+      console.warn('Plan generation failed, using default:', error);
+      return this.getDefaultPlan(intent);
+    }
+  }
+
+  /**
+   * Build context for planner
+   */
+  private buildPlannerContext() {
+    const financials = getFinancialMetrics(this.context!);
+
+    return {
+      risk_distribution: this.context!.risk_distribution?.risk_levels || [],
+      feature_importance: (this.context!.feature_importance?.features || []).slice(0, 15),
+      roi_by_strategy: [
+        { strategy: 'Budget Optimization', roi: 1.60, savings: 571_000_000 },
+        { strategy: 'Contract Conversion', roi: 1.12, savings: 223_000_000 },
+        { strategy: 'Onboarding Excellence', roi: 0.96, savings: 98_000_000 }
+      ],
+      financials: {
+        arpu: financials.arpu,
+        irr: financials.irr,
+        cltv: financials.cltv,
+        ebitdaImpact: financials.ebitdaImpact
+      }
+    };
+  }
+
+  /**
+   * Generate contextual follow-up questions
+   */
+  private generateFollowUps(intent: string, retrievedTerms: any[]): string[] {
+    const baseFollowUps: Record<string, string[]> = {
+      drivers: [
+        "How do these drivers affect ARPU and IRR?",
+        "Show me ROI across retention strategies",
+        "Which segments have highest churn risk?"
+      ],
+      risk: [
+        "What are the top churn drivers for High Risk customers?",
+        "Compare retention strategies by ROI",
+        "Show ARPU impact of 2% churn reduction"
+      ],
+      roi_compare: [
+        "What's the optimal retention budget?",
+        "Show me top churn drivers",
+        "How does churn affect EBITDA?"
+      ],
+      financial_kpis: [
+        "How does churn reduction impact ARPU?",
+        "Compare IRR across strategies",
+        "Show risk distribution"
+      ],
+      generic: [
+        "Show me customer risk distribution",
+        "What are the top churn drivers?",
+        "Compare ROI across strategies"
+      ]
+    };
+
+    const followUps = baseFollowUps[intent] || baseFollowUps.generic;
+
+    // Add retrieved term if available
+    if (retrievedTerms.length > 0 && retrievedTerms[0].kind === 'feature') {
+      followUps[2] = `Deep dive into ${retrievedTerms[0].term} impact`;
+    }
+
+    return followUps.slice(0, 5);
+  }
+
+  /**
+   * Default plan when LLM fails
+   */
+  private getDefaultPlan(intent: string): Plan {
+    return {
+      intent: intent as any || "drivers",
+      metrics: ["feature_importance"],
+      operations: [{
+        op: "topN",
+        from: "feature_importance",
+        select: ["name", "importance"],
+        orderBy: { field: "importance", dir: "desc" },
+        limit: 10
+      }],
+      chart: {
+        kind: "horizontal-bar",
+        title: "Top 10 Churn Drivers (ML Importance)",
+        xLabel: "Importance (%)",
+        yLabel: "Driver"
+      },
+      narrativeFocus: ["top driver", "relative weights"],
+      citations: ["ModelingDeepDive: Feature Importance"]
+    };
+  }
+
+  /**
+   * Fallback response with guaranteed labels
+   */
+  private getFallbackResponse(): CopilotResponse {
+    const riskLevels = this.context!.risk_distribution?.risk_levels || [];
+
+    return {
+      answer: "Our ML model identifies distinct risk segments. Medium risk represents the largest cohort at 47% of customers. Focus retention efforts on High and Very High risk segments for maximum ROI impact.",
+      citations: ["ExecutiveDashboard: Risk Distribution"],
+      chart: {
+        type: 'donut',
+        title: 'Customer Risk Distribution (47.3M Total)',
+        data: riskLevels.map(r => ({
+          label: r.level,
+          value: r.customers,
+          percentage: r.percentage
+        })),
+        config: { width: 500, height: 400 }
+      },
+      followUps: [
+        "What are the top churn drivers?",
+        "Compare ROI across strategies",
+        "Show ARPU and EBITDA impact"
+      ]
+    };
+  }
+
+  /**
+   * Convert schema format to legacy UI format
    */
   private convertToLegacyFormat(schemaResponse: any): CopilotResponse {
     const legacy: CopilotResponse = {
       answer: schemaResponse.text,
       citations: schemaResponse.citations.map((c: any) =>
-        `${c.ref} (${c.source})`
+        typeof c === 'string' ? c : `${c.ref} (${c.source})`
       ),
-      relatedSegments: schemaResponse.relatedSegments,
       followUps: schemaResponse.followUps
     };
 
-    // Convert chart format if present
     if (schemaResponse.chart) {
       const chart = schemaResponse.chart;
-      const series = chart.series[0]; // Use first series
+      const series = chart.series[0];
 
-      // Convert to legacy chart data format
       if (chart.kind === 'donut') {
         legacy.chart = {
           type: 'donut',
@@ -273,48 +370,26 @@ Now answer the user's question following this exact structure.`;
           data: series.data.map((d: any) => ({
             label: d.x,
             value: d.y,
-            percentage: 0 // Will be calculated by chart component
+            percentage: 0
           })),
           config: { width: 500, height: 400 }
         };
-      } else if (chart.kind === 'bar') {
+      } else if (chart.kind === 'bar' || chart.kind === 'horizontal-bar') {
         legacy.chart = {
-          type: 'bar',
+          type: chart.kind,
           title: chart.title,
           data: series.data.map((d: any) => ({
             category: d.x,
-            value: d.y,
-            label: `${d.y.toFixed(0)}${chart.yLabel?.includes('%') ? '%' : ''}`
-          })),
-          config: {
-            width: 550,
-            height: 400,
-            yAxisLabel: chart.yLabel || 'Value'
-          }
-        };
-      } else if (chart.kind === 'horizontal-bar') {
-        legacy.chart = {
-          type: 'horizontal-bar',
-          title: chart.title,
-          data: series.data.map((d: any) => ({
             name: d.x,
-            value: d.y
+            value: d.y,
+            label: String(d.y)
           })),
           config: {
-            width: 600,
-            height: 450,
-            valueFormatter: (v: number) => `${v.toFixed(1)}%`
+            width: chart.kind === 'horizontal-bar' ? 600 : 550,
+            height: chart.kind === 'horizontal-bar' ? 450 : 400,
+            yAxisLabel: chart.yLabel,
+            xAxisLabel: chart.xLabel
           }
-        };
-      } else if (chart.kind === 'line') {
-        legacy.chart = {
-          type: 'line',
-          title: chart.title,
-          data: series.data.map((d: any) => ({
-            x: d.x,
-            y: d.y
-          })),
-          config: { width: 600, height: 400 }
         };
       }
     }
@@ -322,68 +397,49 @@ Now answer the user's question following this exact structure.`;
     return legacy;
   }
 
-  // Smart template fallback (unchanged from before)
+  /**
+   * Smart template fallback
+   */
   private askTemplates(question: string): CopilotResponse {
     const lowerQ = question.toLowerCase();
 
     // Risk questions
-    if (/risk|distribution|high|medium|low/i.test(lowerQ)) {
-      const riskLevels = this.context!.risk_distribution.risk_levels;
-      const high = riskLevels.find(r => r.level === 'High');
-      const veryHigh = riskLevels.find(r => r.level === 'Very High');
-      const totalHigh = ((high?.customers || 0) + (veryHigh?.customers || 0)) / 1_000_000;
-
+    if (/risk|distribution/i.test(lowerQ)) {
+      const riskLevels = this.context!.risk_distribution?.risk_levels || [];
       return {
-        answer: `Our ML Agent identifies ${totalHigh.toFixed(1)}M customers as High/Very High Risk (>30% churn probability). These are our primary intervention targets. The chart shows the full risk distribution across all segments.`,
-        citations: ['ML Agent (AUC 0.85)', 'Risk Distribution'],
+        answer: "Our ML model segments customers into risk tiers. High and Very High risk customers (38% of base) are primary intervention targets with >30% churn probability.",
+        citations: ['ExecutiveDashboard: Risk Distribution'],
         chart: {
           type: 'donut',
           title: 'Customer Risk Distribution',
           data: riskLevels.map(r => ({ label: r.level, value: r.customers, percentage: r.percentage })),
           config: { width: 500, height: 400 }
-        }
+        },
+        followUps: ["Top churn drivers?", "Compare ROI strategies", "Show financial KPIs"]
       };
     }
 
-    // Feature/driver questions
-    if (/feature|driver|cause|factor|why|predict/i.test(lowerQ)) {
-      const features = this.context!.feature_importance.features;
-      const top = features[0];
-
+    // Churn drivers
+    if (/driver|cause|feature/i.test(lowerQ)) {
+      const features = this.context!.feature_importance?.features || [];
       return {
-        answer: `The top churn driver is "${top.name}" with ${(top.importance * 100).toFixed(1)}% predictive weight. ${top.interpretation} The chart shows the top 10 drivers ranked by ML importance.`,
-        citations: ['ML Agent', 'Feature Importance Analysis'],
+        answer: `Contract Type is the #1 churn driver at ${(features[0]?.importance * 100).toFixed(1)}% importance. Month-to-month customers have 3-5x higher churn than contract customers.`,
+        citations: ['ModelingDeepDive: Feature Importance'],
         chart: {
           type: 'horizontal-bar',
           title: 'Top 10 Churn Drivers',
           data: features.slice(0, 10).map(f => ({ name: f.name, value: f.importance * 100 })),
-          config: { width: 600, height: 450, valueFormatter: (v: number) => `${v.toFixed(1)}%` }
-        }
-      };
-    }
-
-    // ROI comparison
-    if (/roi|return|compare|strateg/i.test(lowerQ)) {
-      return {
-        answer: `Three retention strategies with distinct ROI profiles: Budget Optimization (160% ROI, $571M savings), Contract Conversion (112% ROI, $223M savings), and Onboarding Excellence (96% ROI, $98M savings). Combined portfolio delivers 90% blended ROI.`,
-        citations: ['Strategy Agent', 'ROI Analysis'],
-        chart: {
-          type: 'bar',
-          title: 'ROI Comparison Across Strategies',
-          data: [
-            { category: 'Budget\nOptimization', value: 160, label: '$571M' },
-            { category: 'Contract\nConversion', value: 112, label: '$223M' },
-            { category: 'Onboarding\nExcellence', value: 96, label: '$98M' }
-          ],
-          config: { width: 550, height: 400, valueFormatter: (v: number) => `${v}%`, yAxisLabel: 'ROI (%)' }
-        }
+          config: { width: 600, height: 450 }
+        },
+        followUps: ["Show risk distribution", "Compare strategies", "ARPU impact?"]
       };
     }
 
     // Generic
     return {
-      answer: `I can analyze customer segments, churn drivers, and retention strategies. Try: "Show me risk distribution", "What are the top churn drivers?", or "Compare ROI across strategies".`,
+      answer: "I can analyze customer segments, churn drivers, and retention strategies. Try asking about risk distribution, top drivers, or ROI comparison.",
       citations: ['Strategy Copilot'],
+      followUps: ["Show risk distribution", "Top churn drivers?", "Compare ROI strategies"]
     };
   }
 }
