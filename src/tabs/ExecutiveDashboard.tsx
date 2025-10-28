@@ -8,6 +8,8 @@ import WaterfallChart from '@/components/charts/WaterfallChart';
 import { formatCompactCurrency, formatLargeNumber, formatPercent } from '@/utils/formatters';
 import { ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { getFinancialMetrics, formatFinancial } from '@/services/financialData';
+import { riskColorMap } from '@/utils/colors';
+import PoweredByAgents from '@/components/shared/PoweredByAgents';
 import numeral from 'numeral';
 
 export default function ExecutiveDashboard() {
@@ -23,19 +25,11 @@ export default function ExecutiveDashboard() {
   const riskData = useMemo(() => {
     if (!data?.risk_distribution) return [];
 
-    // Kearney-compliant gray + purple palette
-    const riskColors: Record<string, string> = {
-      'Low': '#D2D2D2',       // Light gray
-      'Medium': '#A5A5A5',    // Medium gray
-      'High': '#7823DC',      // Light purple (Kearney)
-      'Very High': '#7823DC', // Primary purple (Kearney)
-    };
-
     return data.risk_distribution.risk_levels.map((level) => ({
       level: level.level,
       customers: level.customers,
       percentage: level.percentage,
-      color: riskColors[level.level] || '#A5A5A5',
+      color: riskColorMap[level.level] || riskColorMap['Low'],
     }));
   }, [data]);
 
@@ -413,6 +407,11 @@ export default function ExecutiveDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="mt-8 mb-4">
+        <PoweredByAgents />
+      </footer>
     </div>
   );
 }
