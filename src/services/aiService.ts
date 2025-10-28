@@ -1,7 +1,7 @@
 /**
- * AI Service for Strategy Copilot - LIVE GPT-4o Integration
+ * AI Service for Strategy Copilot - LIVE GPT-5 Integration
  *
- * Provides intelligent responses using OpenAI GPT-4o with fallback templates.
+ * Provides intelligent responses using OpenAI GPT-5 with fallback templates.
  */
 
 import OpenAI from 'openai';
@@ -34,7 +34,7 @@ export class AIService {
         apiKey: apiKey,
         dangerouslyAllowBrowser: true // For demo - use backend in production
       });
-      console.log('✅ Strategy Copilot: GPT-4o LIVE mode enabled');
+      console.log('✅ Strategy Copilot: GPT-5 LIVE mode enabled');
     } else {
       console.warn('⚠️ Strategy Copilot: Running in template mode (no API key)');
     }
@@ -52,12 +52,12 @@ export class AIService {
       };
     }
 
-    // Try GPT-4o first if available
+    // Try GPT-5 first if available
     if (this.openai) {
       try {
-        return await this.askGPT4o(question);
+        return await this.askGPT5(question);
       } catch (error) {
-        console.error('GPT-4o error, falling back to templates:', error);
+        console.error('GPT-5 error, falling back to templates:', error);
         // Fall through to templates
       }
     }
@@ -66,7 +66,7 @@ export class AIService {
     return this.askTemplates(question);
   }
 
-  private async askGPT4o(question: string): Promise<CopilotResponse> {
+  private async askGPT5(question: string): Promise<CopilotResponse> {
     const contextSummary = this.buildContextSummary();
 
     const systemPrompt = `You are an expert data analyst for TeleVantage, analyzing customer churn.
@@ -103,7 +103,7 @@ RULES:
 - For ROI, reference: Budget(160%), Contract(112%), Onboarding(96%)`;
 
     const response = await this.openai!.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: question }

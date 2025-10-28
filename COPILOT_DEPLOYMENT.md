@@ -1,8 +1,8 @@
-# Strategy Copilot - GPT-4o Deployment Guide
+# Strategy Copilot - GPT-5 Deployment Guide
 
 ## ✅ LIVE AI is Now Integrated!
 
-The Strategy Copilot now uses **OpenAI GPT-4o** to provide real, intelligent responses with data visualizations.
+The Strategy Copilot now uses **OpenAI GPT-5** to provide real, intelligent responses with data visualizations.
 
 ---
 
@@ -11,14 +11,14 @@ The Strategy Copilot now uses **OpenAI GPT-4o** to provide real, intelligent res
 ### Local Development
 When you run `npm run dev`, the copilot will:
 1. Check for `VITE_OPENAI_API_KEY` in `.env`
-2. If found → Use GPT-4o LIVE mode ✅
+2. If found → Use GPT-5 LIVE mode ✅
 3. If not found → Use smart template fallback mode
 
 You'll see console logs:
-- `✅ Strategy Copilot: GPT-4o LIVE mode enabled` (API key works)
+- `✅ Strategy Copilot: GPT-5 LIVE mode enabled` (API key works)
 - `⚠️ Strategy Copilot: Running in template mode (no API key)` (fallback)
 
-### What GPT-4o Does
+### What GPT-5 Does
 - Analyzes 47.3M customer records, 54 segments, risk distribution
 - Answers ANY question about churn, segments, features, ROI
 - Automatically generates charts when helpful
@@ -28,7 +28,7 @@ You'll see console logs:
 
 ## AWS Amplify Deployment
 
-**CRITICAL:** You must set the environment variable in Amplify for GPT-4o to work.
+**CRITICAL:** You must set the environment variable in Amplify for GPT-5 to work.
 
 ### Step 1: Go to Amplify Console
 https://console.aws.amazon.com/amplify/home
@@ -49,7 +49,7 @@ After adding the env var, trigger a new deployment:
 - Option A: Push a new commit to main
 - Option B: In Amplify Console → click "Redeploy this version"
 
-The copilot will now use GPT-4o in production!
+The copilot will now use GPT-5 in production!
 
 ---
 
@@ -77,7 +77,7 @@ Once deployed, try these questions:
 - "What's the optimal retention budget?"
 - "Show me revenue impact of each scenario"
 
-**GPT-4o will:**
+**GPT-5 will:**
 - Analyze the actual customer data
 - Generate relevant visualizations (donut charts, bar charts, etc.)
 - Provide specific numbers and ROI projections
@@ -87,7 +87,7 @@ Once deployed, try these questions:
 
 ## Cost Considerations
 
-**OpenAI Pricing (GPT-4o):**
+**OpenAI Pricing (GPT-5):**
 - Input: ~$0.005 per 1K tokens
 - Output: ~$0.015 per 1K tokens
 - **Average query cost: $0.01 - $0.03**
@@ -144,7 +144,7 @@ If the API key is missing or quota exceeded:
 - Check for rate limit errors
 
 ### Slow responses
-- GPT-4o typically responds in 1-3 seconds
+- GPT-5 typically responds in 1-3 seconds
 - Check network connection
 - Verify not hitting rate limits
 
