@@ -1,0 +1,24 @@
+{
+  "risk_levels": [
+    {
+      "level": "Low",
+      "customers": 21413926,
+      "percentage": 0.453
+    },
+    {
+      "level": "Medium",
+      "customers": 7890048,
+      "percentage": 0.167
+    },
+    {
+      "level": "High",
+      "customers": 8104926,
+      "percentage": 0.171
+    },
+    {
+      "level": "Very High",
+      "customers": 9891098,
+      "percentage": 0.209
+    }
+  ]
+}

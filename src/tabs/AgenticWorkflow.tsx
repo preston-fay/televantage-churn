@@ -1,0 +1,339 @@
+import React from 'react';
+import { BarChart3, Bot, Lightbulb, CheckCircle, Check, Zap, Clock } from 'lucide-react';
+
+export default function AgenticWorkflow() {
+  const agents = [
+    {
+      name: 'Data Agent',
+      Icon: BarChart3,
+      description: 'Ingests and validates customer data from multiple sources, ensuring data quality and feature completeness',
+      inputs: ['CRM records (47.3M customers)', 'Billing history', 'Service usage logs'],
+      outputs: ['Cleaned dataset', 'Engineered features (150+ variables)', 'Data quality metrics'],
+    },
+    {
+      name: 'ML Agent',
+      Icon: Bot,
+      description: 'Trains and evaluates multiple model architectures, selecting optimal approach based on business requirements',
+      inputs: ['Processed features', 'Historical churn labels', 'Validation holdout set'],
+      outputs: ['Production model (AUC: 0.85)', 'Performance benchmarks', 'Feature importance rankings'],
+    },
+    {
+      name: 'Strategy Agent',
+      Icon: Lightbulb,
+      description: 'Translates model predictions into actionable retention strategies with financial projections and risk assessments',
+      inputs: ['Churn probabilities', 'Customer segments', 'Business constraints'],
+      outputs: ['Risk scores (by customer)', 'Intervention recommendations', 'ROI scenarios'],
+    },
+    {
+      name: 'QA Agent',
+      Icon: CheckCircle,
+      description: 'Validates analytical outputs against business rules, compliance requirements, and quality standards',
+      inputs: ['Strategy proposals', 'Model predictions', 'Governance policies'],
+      outputs: ['Validation report', 'Compliance certification', 'Executive summary'],
+    },
+  ];
+
+  return (
+    <div className="container mx-auto px-6 py-8 max-w-7xl">
+      <h2 className="text-4xl font-bold text-text-primary mb-3">AI-Accelerated Analytics Workflow</h2>
+      <p className="text-text-secondary text-xl mb-12 leading-relaxed">
+        How multi-agent AI orchestration compresses traditional consulting timelines from months to days while maintaining analytical rigor and business relevance.
+      </p>
+
+      {/* Time Comparison Hero */}
+      <div className="card mb-12 p-8 border-2" style={{ borderColor: 'var(--color-accent-primary)' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <div className="flex items-center space-x-3 mb-4">
+              <Clock size={24} className="text-text-tertiary" />
+              <div className="text-text-tertiary text-sm font-semibold uppercase tracking-wide">Traditional Approach</div>
+            </div>
+            <div className="text-6xl font-bold text-text-secondary mb-2">12-16</div>
+            <div className="text-text-secondary text-lg">weeks to actionable insights</div>
+            <p className="text-text-tertiary text-sm mt-4">
+              Manual data wrangling, single-model development, subjective segmentation, static PowerPoint deliverables
+            </p>
+          </div>
+          <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-accent-primary)' }}>
+            <div className="flex items-center space-x-3 mb-4">
+              <Zap size={24} className="text-white" />
+              <div className="text-white text-sm font-semibold uppercase tracking-wide opacity-90">AI-Enabled Approach</div>
+            </div>
+            <div className="text-6xl font-bold text-white mb-2">1-2</div>
+            <div className="text-white text-lg font-semibold">weeks to actionable insights</div>
+            <p className="text-white text-sm mt-4 opacity-90">
+              Automated pipelines, multi-model optimization, AI-driven scenarios, interactive dashboards with real-time updates
+            </p>
+            <div className="mt-6 pt-6 border-t border-white border-opacity-20">
+              <div className="text-white text-3xl font-bold">~90% faster</div>
+              <div className="text-white text-sm opacity-75">Time to value acceleration</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Overview */}
+      <div className="card mb-12">
+        <h3 className="text-2xl font-semibold text-text-primary mb-4">
+          Multi-Agent Orchestration Architecture
+        </h3>
+        <p className="text-text-secondary text-lg mb-6 leading-relaxed">
+          The TeleVantage platform employs a coordinated system of specialized AI agents, each optimized for a specific analytical domain. This modular architecture ensures quality, speed, and business alignment throughout the analytical lifecycle.
+        </p>
+        <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>
+          <p className="text-text-secondary leading-relaxed">
+            <strong className="text-text-primary">Why it matters:</strong> Traditional monolithic analytics systems create bottlenecks, lack transparency, and require full rebuilds for incremental improvements. Our agent-based approach enables parallel processing, independent optimization, and seamless upgrades—delivering enterprise-grade analytics at startup speed.
+          </p>
+        </div>
+      </div>
+
+      {/* Agent Flow Diagram */}
+      <div className="card mb-12">
+        <h3 className="text-2xl font-semibold text-text-primary mb-8">Four-Agent Pipeline</h3>
+
+        <div className="flex flex-col space-y-6">
+          {agents.map((agent, index) => (
+            <React.Fragment key={agent.name}>
+              {/* Agent Card */}
+              <div className="flex items-start space-x-6 p-6 rounded-lg" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>
+                {/* Agent Icon */}
+                <div
+                  className="flex-shrink-0 w-16 h-16 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: 'var(--color-accent-primary)' }}
+                >
+                  <agent.Icon size={32} className="text-white" />
+                </div>
+
+                {/* Agent Details */}
+                <div className="flex-1">
+                  <h4 className="text-xl font-semibold text-text-primary mb-3">{agent.name}</h4>
+                  <p className="text-text-secondary mb-6 leading-relaxed">{agent.description}</p>
+
+                  {/* Inputs/Outputs */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <div className="text-text-tertiary text-xs uppercase tracking-wide font-semibold mb-3">
+                        Inputs
+                      </div>
+                      <ul className="space-y-2">
+                        {agent.inputs.map((input) => (
+                          <li
+                            key={input}
+                            className="text-text-secondary text-sm flex items-center"
+                          >
+                            <span className="mr-2 text-text-tertiary">→</span>
+                            {input}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <div className="text-text-tertiary text-xs uppercase tracking-wide font-semibold mb-3">
+                        Outputs
+                      </div>
+                      <ul className="space-y-2">
+                        {agent.outputs.map((output) => (
+                          <li
+                            key={output}
+                            className="text-text-secondary text-sm flex items-center"
+                          >
+                            <Check size={16} className="mr-2 text-text-primary" />
+                            {output}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Arrow between agents */}
+              {index < agents.length - 1 && (
+                <div className="flex justify-center">
+                  <svg width="40" height="40" viewBox="0 0 40 40">
+                    <line
+                      x1="20"
+                      y1="0"
+                      x2="20"
+                      y2="30"
+                      stroke="var(--color-accent-primary)"
+                      strokeWidth="2"
+                    />
+                    <polygon
+                      points="20,40 15,28 25,28"
+                      fill="var(--color-accent-primary)"
+                    />
+                  </svg>
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* Kearney Differentiation */}
+      <div className="card mb-12 border-2" style={{ borderColor: 'var(--color-accent-primary)' }}>
+        <div className="flex items-start space-x-4">
+          <div
+            className="flex-shrink-0 w-14 h-14 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: 'var(--color-accent-primary)' }}
+          >
+            <Zap size={32} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-2xl font-semibold text-text-primary mb-3">
+              Strategic Advantages of Agent-Based Architecture
+            </h3>
+            <p className="text-text-secondary mb-6 leading-relaxed">
+              Unlike traditional monolithic analytics systems, our multi-agent approach delivers four critical business advantages:
+            </p>
+            <ul className="space-y-4 text-text-secondary">
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 text-lg text-text-primary">
+                  •
+                </span>
+                <div>
+                  <strong className="text-text-primary text-lg">Domain Specialization:</strong>
+                  <p className="text-text-secondary mt-1">Each agent is optimized for its specific domain (data engineering, machine learning, strategy formulation, quality assurance), delivering expert-level performance without the complexity of managing a single monolithic system.</p>
+                </div>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 text-lg text-text-primary">
+                  •
+                </span>
+                <div>
+                  <strong className="text-text-primary text-lg">Independent Evolution:</strong>
+                  <p className="text-text-secondary mt-1">Agents can be upgraded, replaced, or fine-tuned independently without disrupting the entire pipeline. New modeling techniques, data sources, or business rules can be integrated seamlessly.</p>
+                </div>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 text-lg text-text-primary">
+                  •
+                </span>
+                <div>
+                  <strong className="text-text-primary text-lg">Built-In Quality Governance:</strong>
+                  <p className="text-text-secondary mt-1">Dedicated QA agent ensures business alignment, regulatory compliance, and analytical rigor at every step—no more "black box" model outputs that executives can't trust or explain.</p>
+                </div>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 text-lg text-text-primary">
+                  •
+                </span>
+                <div>
+                  <strong className="text-text-primary text-lg">Extensibility Without Re-Architecture:</strong>
+                  <p className="text-text-secondary mt-1">New capabilities (personalization, campaign optimization, customer journey mapping) can be added as new agents without rebuilding existing infrastructure. Scale functionality as business needs evolve.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Traditional vs AI-Enabled Comparison */}
+      <div className="card">
+        <h3 className="text-2xl font-semibold text-text-primary mb-4">
+          Phase-by-Phase Time Comparison
+        </h3>
+        <p className="text-text-secondary text-lg mb-8 leading-relaxed">
+          Breaking down the 90% time acceleration across the four stages of the analytical lifecycle.
+        </p>
+
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b-2" style={{ borderColor: 'var(--color-border-primary)' }}>
+                <th className="text-left py-4 px-4 text-text-primary font-semibold text-base">Phase</th>
+                <th className="text-left py-4 px-4 text-text-primary font-semibold text-base">
+                  Traditional Consulting Process
+                </th>
+                <th className="text-left py-4 px-4 text-text-primary font-semibold text-base">
+                  AI-Enabled Process
+                </th>
+                <th className="text-right py-4 px-4 text-text-primary font-semibold text-base">
+                  Acceleration
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b" style={{ borderColor: 'var(--color-border-primary)' }}>
+                <td className="py-4 px-4 text-text-primary font-semibold">Data Preparation</td>
+                <td className="py-4 px-4 text-text-secondary">
+                  Manual SQL queries, Excel transformations, data quality checks by analysts<br/>
+                  <span className="text-text-tertiary text-sm">Timeline: 4-6 weeks</span>
+                </td>
+                <td className="py-4 px-4 text-text-secondary">
+                  Automated ingestion, validation, and feature engineering with quality metrics<br/>
+                  <span className="text-text-tertiary text-sm">Timeline: 2-3 days</span>
+                </td>
+                <td className="py-4 px-4 text-right font-bold text-lg text-text-primary">
+                  90% faster
+                </td>
+              </tr>
+              <tr className="border-b" style={{ borderColor: 'var(--color-border-primary)' }}>
+                <td className="py-4 px-4 text-text-primary font-semibold">Model Development</td>
+                <td className="py-4 px-4 text-text-secondary">
+                  Single model approach, manual hyperparameter tuning, ad-hoc validation<br/>
+                  <span className="text-text-tertiary text-sm">Timeline: 3-4 weeks</span>
+                </td>
+                <td className="py-4 px-4 text-text-secondary">
+                  Multi-model comparison (6 architectures), automated optimization, systematic evaluation<br/>
+                  <span className="text-text-tertiary text-sm">Timeline: 1-2 days</span>
+                </td>
+                <td className="py-4 px-4 text-right font-bold text-lg text-text-primary">
+                  85% faster
+                </td>
+              </tr>
+              <tr className="border-b" style={{ borderColor: 'var(--color-border-primary)' }}>
+                <td className="py-4 px-4 text-text-primary font-semibold">
+                  Strategy Formulation
+                </td>
+                <td className="py-4 px-4 text-text-secondary">
+                  Manual customer segmentation, subjective prioritization, spreadsheet-based ROI analysis<br/>
+                  <span className="text-text-tertiary text-sm">Timeline: 2-3 weeks</span>
+                </td>
+                <td className="py-4 px-4 text-text-secondary">
+                  AI-powered scenario planning, optimization algorithms, interactive ROI modeling<br/>
+                  <span className="text-text-tertiary text-sm">Timeline: 1 day</span>
+                </td>
+                <td className="py-4 px-4 text-right font-bold text-lg text-text-primary">
+                  95% faster
+                </td>
+              </tr>
+              <tr className="border-b" style={{ borderColor: 'var(--color-border-primary)' }}>
+                <td className="py-4 px-4 text-text-primary font-semibold">QA & Delivery</td>
+                <td className="py-4 px-4 text-text-secondary">
+                  Manual review cycles, static PowerPoint decks, email-based collaboration<br/>
+                  <span className="text-text-tertiary text-sm">Timeline: 2-3 weeks</span>
+                </td>
+                <td className="py-4 px-4 text-text-secondary">
+                  Automated validation, interactive dashboards, real-time collaboration and updates<br/>
+                  <span className="text-text-tertiary text-sm">Timeline: 1 day</span>
+                </td>
+                <td className="py-4 px-4 text-right font-bold text-lg text-text-primary">
+                  95% faster
+                </td>
+              </tr>
+              <tr
+                className="border-t-2"
+                style={{ borderColor: 'var(--color-accent-primary)', backgroundColor: 'var(--color-bg-tertiary)' }}
+              >
+                <td className="py-5 px-4 text-text-primary font-bold text-lg">Total Timeline</td>
+                <td className="py-5 px-4 text-text-secondary font-semibold text-lg">12-16 weeks</td>
+                <td className="py-5 px-4 font-semibold text-lg text-text-primary">1-2 weeks</td>
+                <td className="py-5 px-4 text-right text-2xl font-bold text-text-primary">
+                  ~90% faster
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-8 p-6 rounded-lg" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>
+          <p className="text-text-secondary text-lg leading-relaxed">
+            <strong className="text-text-primary">Strategic Implication:</strong> The agentic workflow compresses traditional consulting timelines from quarters to weeks, enabling telcos to respond to competitive threats in near real-time. This speed advantage—combined with maintained analytical rigor and governance—represents a fundamental shift in how retention strategy is developed and deployed.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

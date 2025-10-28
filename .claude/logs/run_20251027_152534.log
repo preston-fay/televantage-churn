@@ -1,0 +1,27 @@
+[2025-10-27 15:25:34] [INFO] Started run 20251027_152534
+[2025-10-27 15:25:34] [INFO] Current phase: planning
+[2025-10-27 15:25:34] [INFO] Loaded intake: intake.yaml
+[2025-10-27 15:25:34] [INFO] Running phase: planning
+[2025-10-27 15:25:34] [INFO] Invoking agent: architect (phase: planning)
+[2025-10-27 15:25:34] [INFO] Agent prompt prepared (9984 chars)
+[2025-10-27 15:25:34] [INFO] Agent transcript written: /Users/pfay01/Projects/televantage-churn-demo/.claude/logs/agents/20251027_152534_planning_architect.log
+[2025-10-27 15:25:34] [ERROR] Agent architect failed
+[2025-10-27 15:25:34] [INFO] Consensus request generated: /Users/pfay01/Projects/televantage-churn-demo/.claude/consensus/REQUEST.md
+[2025-10-27 15:25:34] [INFO] Consensus required for phase: planning
+[2025-10-27 15:25:34] [INFO] Phase planning requires consensus
+[2025-10-27 16:11:59] [INFO] Running phase: data_engineering
+[2025-10-27 16:11:59] [INFO] Invoking agent: data (phase: data_engineering)
+[2025-10-27 16:11:59] [INFO] Agent prompt prepared (20753 chars)
+[2025-10-27 16:11:59] [INFO] Agent transcript written: /Users/pfay01/Projects/televantage-churn-demo/.claude/logs/agents/20251027_152534_data_engineering_data.log
+[2025-10-27 16:11:59] [ERROR] Agent data failed
+[2025-10-27 16:11:59] [INFO] Validating 2 required artifact(s)
+[2025-10-27 16:11:59] [INFO] Validation status: fail
+[2025-10-27 16:11:59] [ERROR] Phase data_engineering failed
+[2025-10-27 16:17:40] [INFO] Running phase: development
+[2025-10-27 16:17:40] [INFO] Invoking agent: developer (phase: development)
+[2025-10-27 16:17:40] [INFO] Agent prompt prepared (11017 chars)
+[2025-10-27 16:17:40] [INFO] Agent transcript written: /Users/pfay01/Projects/televantage-churn-demo/.claude/logs/agents/20251027_152534_development_developer.log
+[2025-10-27 16:17:40] [ERROR] Agent developer failed
+[2025-10-27 16:17:40] [INFO] Validating 3 required artifact(s)
+[2025-10-27 16:17:40] [INFO] Validation status: partial
+[2025-10-27 16:17:40] [ERROR] Phase development failed

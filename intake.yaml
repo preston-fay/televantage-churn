@@ -1,14 +1,342 @@
 project:
   name: TeleVantage Churn Intelligence Platform
   type: webapp
-  description: Full-stack web application template
+  description: |
+    Executive demo application showcasing AI-powered churn prediction and retention
+    strategy optimization for TeleVantage, a fictional #7 US telecom carrier with
+    47.3M subscribers. Built to demonstrate Kearney's multi-agent AI orchestration
+    capabilities and strategic insights derived from advanced churn modeling.
+
+  context: |
+    This demo application scales real churn analysis results from the telco-churn_v2
+    project (7,044 customers) to enterprise scale (47.3M customers - 6,714x scale factor).
+
+    Target Audience: C-suite executives (CEO, CFO, CMO) - non-technical stakeholders
+    Use Case: Executive briefing, strategic decision support, investment justification
+    Timeline: 2 weeks to build
+    Deployment: AWS Amplify static hosting
+
+    Business Context:
+    - TeleVantage: Fictional #7 US carrier, 47.3M subscribers
+    - Annual churn cost: $1.42B (baseline scenario)
+    - AI-identified savings opportunity: $312M (22% reduction)
+    - Model performance: 85% AUC (industry-leading accuracy)
+
+    Source Data: /Users/pfay01/Projects/telco-churn_v2
+    - 6 models trained (LR, XGB, RF, CB, LGB, MLP)
+    - Winner: Logistic Regression (ElasticNet) - AUC 0.8500
+    - 54 customer segments identified (tenure × contract × value tier)
+    - Segment-specific optimal thresholds applied
+    - 26% targeting rate (1,834/7,044 customers)
+
 requirements:
   functional:
-  - User authentication and authorization
-  - Responsive UI for desktop and mobile
-  - RESTful API with {{FEATURES}}
+    # Core Application Features
+    - "5-tab single-page application (SPA) with smooth navigation"
+    - "Tab 1: Executive Dashboard with hero metrics, risk distribution, waterfall chart"
+    - "Tab 2: Interactive Scenario Planner with 3 what-if simulators"
+    - "Tab 3: Agentic AI Workflow visualization (static diagram)"
+    - "Tab 4: Modeling & Analytics Deep-Dive (model comparison, metrics, features)"
+    - "Tab 5: Interactive Segment Explorer with heatmap and drill-down modals"
+
+    # Executive Dashboard (Tab 1)
+    - "Hero KPI Cards: Customer Base (47.3M), Annual Churn Cost ($1.42B), AI Opportunity ($312M), Model AUC (85%)"
+    - "Risk Distribution: Donut chart showing Low/Med/High/Very High risk segments"
+    - "Churn Economics Waterfall: Baseline Loss → AI Savings → Residual Risk"
+    - "Top 3 Strategic Recommendations with impact/effort/timeline"
+    - "Quick Insights callouts with key findings"
+
+    # Scenario Planner (Tab 2)
+    - "Scenario A - Contract Conversion: M2M → Annual conversion slider (0-30%), cost input, live ROI calculation"
+    - "Scenario B - Onboarding Excellence: Early churn reduction slider (0-50%), investment input, NPV calculation"
+    - "Scenario C - Budget Optimization: Retention budget slider ($50M-$500M), cost per intervention, ROI curve"
+    - "Global Economic Assumptions Panel: ARPU ($65), LTV (36mo), Margin (45%), Winback rate (30%), Discount rate (10%)"
+    - "Real-time recalculation of all scenarios when assumptions change"
+    - "Before/After visualizations for each scenario"
+
+    # Agentic AI Workflow (Tab 3)
+    - "Static workflow diagram: Data Agent → ML Agent → Strategy Agent → QA Agent"
+    - "Agent descriptions with inputs/outputs for each stage"
+    - "Kearney differentiation messaging: AI + Consultants = Better outcomes"
+    - "Time/cost comparison: Traditional (12 weeks) vs AI-enabled (2 weeks)"
+    - "Value proposition callout: 80% automation → consultants focus on strategy"
+
+    # Modeling Deep-Dive (Tab 4)
+    - "Section 4A - Model Zoo: Comparison table + grouped bar chart (6 models by AUC/Brier/AP)"
+    - "Section 4B - Performance Metrics: AUC explanation, calibration plot, confusion matrix with business labels"
+    - "Section 4C - Feature Importance: Top 10 drivers with business interpretations"
+    - "Section 4D - Profit Optimization: Profit curve, threshold selection rationale, cost-benefit breakdown"
+
+    # Segment Explorer (Tab 5)
+    - "Interactive heatmap: Tenure (X) × Contract (Y), color = churn prob, size = population"
+    - "Click segment → modal with: Population, Churn prob, LTV, Risk level, Strategy, ROI, Timeline"
+    - "54 segments total (5 tenure bands × 3 contracts × 3 value tiers + unknown fallbacks)"
+    - "Color gradient: Green (low risk) → Yellow (medium) → Red (high risk)"
+
+    # Data & Performance
+    - "Static JSON data files (no live API calls needed)"
+    - "Client-side calculations for scenario simulations (JavaScript)"
+    - "Pre-calculated segment metrics for fast rendering"
+    - "Lazy loading for heavy visualizations"
+
+    # User Experience
+    - "Smooth tab transitions with animated content"
+    - "Responsive design (desktop-first, tablet-compatible)"
+    - "Loading states for data-heavy visualizations"
+    - "Hover tooltips on all charts with context"
+    - "Accessible keyboard navigation"
+    - "Print-friendly views for executive reports"
+
   technical:
-  - 'Frontend: React/Vue/Angular'
-  - 'Backend: FastAPI/Flask/Node.js'
-  - 'Database: PostgreSQL/MongoDB'
-  - Deploy to cloud (AWS/GCP/Azure)
+    # Frontend Stack
+    - "Framework: React 18+ with TypeScript 5+"
+    - "Build Tool: Vite 5+ (fast HMR, optimized builds)"
+    - "Styling: Tailwind CSS 3+ with custom Kearney dark theme"
+    - "Visualizations: D3.js 7+ for all charts (NO Chart.js, NO Recharts)"
+    - "State Management: React Context API + useState (no Redux needed)"
+    - "Routing: React Router 6+ for tab navigation"
+
+    # Backend Stack (Minimal)
+    - "API: FastAPI 0.104+ (Python) for scenario calculation endpoints (optional)"
+    - "Data Format: Static JSON files generated from telco-churn_v2 results"
+    - "No database required (static demo data)"
+
+    # Design System
+    - "Background: Pure black (#0A0A0A)"
+    - "Primary accent: Kearney purple (#7823DC) - use sparingly for highlights only"
+    - "Text: White (#FFFFFF) for headings, Light gray (#E5E5E5) for body"
+    - "Font: Inter (Google Fonts, modern UI font optimized for readability)"
+    - "NO gridlines on any charts"
+    - "NO emojis in UI"
+    - "Label-first approach (chart titles, axis labels, legends)"
+    - "High contrast for accessibility (WCAG AA compliant)"
+
+    # D3.js Visualizations (7+ charts)
+    - "Donut chart: Risk distribution with labeled segments"
+    - "Waterfall chart: Churn economics breakdown"
+    - "Grouped bar chart: Model comparison (AUC/Brier/AP)"
+    - "Line chart: Churn rate by tenure band"
+    - "ROI curve: Budget optimization with optimal point highlighted"
+    - "Calibration plot: Predicted vs actual churn (scatter + diagonal)"
+    - "Horizontal bar chart: Feature importance (sorted, labeled)"
+    - "Heatmap: Segment explorer (interactive, color gradient, sized bubbles)"
+    - "All charts: NO gridlines, clean axes, Kearney dark theme"
+
+    # Data Scaling Methodology
+    - "Base: 7,044 customers from telco-churn_v2"
+    - "Target: 47.3M customers (scale factor: 6,714x)"
+    - "Maintain distributions: Segment sizes, churn rates, risk levels"
+    - "Preserve model metrics: AUC 0.8500, Brier 0.134, AP 0.666"
+    - "Scale financial metrics: ARPU $65, LTV 36 months, Margin 45%"
+    - "Generate segment-level aggregates (54 segments)"
+
+    # Deployment
+    - "Platform: AWS Amplify (static hosting + CI/CD)"
+    - "Build: Vite production build (optimized, tree-shaken)"
+    - "Hosting: CloudFront CDN for global delivery"
+    - "Configuration: amplify.yml (use pattern from telco-churn_v2)"
+    - "Environment: Single environment (production demo)"
+
+    # Testing
+    - "Unit tests: Vitest for React components"
+    - "E2E tests: Playwright for tab navigation and interactions"
+    - "Visual regression: Percy or Chromatic for design QA"
+    - "Accessibility: axe-core for WCAG compliance"
+
+    # Performance Targets
+    - "Initial page load: <3 seconds"
+    - "Tab switch: <300ms"
+    - "Chart render: <1 second"
+    - "Scenario recalculation: <100ms"
+    - "Lighthouse score: >90 performance, >95 accessibility"
+
+  constraints:
+    - "Timeline: 2 weeks end-to-end (Planning → Dev → QA → Docs)"
+    - "No live model inference (pre-calculated results only)"
+    - "Static data (no database, no user authentication)"
+    - "Desktop-first (mobile-friendly, but optimized for 1920×1080 presentations)"
+    - "Single user (no multi-tenancy, no user accounts)"
+    - "Demo quality (production-ready UI, but simplified backend)"
+    - "NO pie charts (donut charts acceptable, but prefer bar/line charts)"
+    - "NO gridlines on any visualizations"
+    - "NO emojis in UI (demo script can use them)"
+    - "MUST use Inter font (Google Fonts, modern and professional)"
+    - "Text must be white/light gray (NOT purple on black - readability issue)"
+    - "Kearney purple ONLY for accents (buttons, highlights, CTAs)"
+
+deliverables:
+  architecture:
+    - "System architecture diagram (frontend + optional API)"
+    - "Component hierarchy (5 tabs, shared components)"
+    - "Data flow diagram (JSON → React state → D3 charts)"
+    - "Design system documentation (colors, typography, spacing)"
+
+  implementation:
+    - "Complete React application with TypeScript"
+    - "5 tab components: Executive, Scenarios, Workflow, Analytics, Segments"
+    - "7+ D3.js visualizations (all charts custom-built)"
+    - "3 interactive scenario simulators with live calculations"
+    - "Static JSON data files scaled from telco-churn_v2"
+    - "Tailwind config with Kearney dark theme"
+    - "Reusable components: KPI Card, Chart Container, Modal, Slider, Input"
+
+  deployment:
+    - "AWS Amplify configuration (amplify.yml)"
+    - "GitHub Actions CI/CD workflow (optional)"
+    - "Build optimization (code splitting, lazy loading)"
+    - "Environment variables configuration"
+    - "CloudFront CDN setup (if needed)"
+
+  documentation:
+    - "README.md: Local dev setup, build instructions, deployment guide"
+    - "DEMO_SCRIPT.md: Talking points for each tab, key messages, Q&A prep"
+    - "DESIGN_SYSTEM.md: Colors, typography, component library"
+    - "DATA_GENERATION.md: How data was scaled from telco-churn_v2"
+    - "ARCHITECTURE.md: Technical decisions, trade-offs, future enhancements"
+
+  demo_materials:
+    - "Executive summary (1-pager): Project overview, key findings, ROI"
+    - "Demo script with timing: 15-minute walkthrough for C-suite"
+    - "FAQ document: Common questions + answers"
+    - "Screenshot gallery: All 5 tabs for offline presentations"
+
+acceptance_criteria:
+  - "All 5 tabs functional and visually polished"
+  - "All 7+ D3.js charts render correctly with dark theme"
+  - "All 3 scenario simulators calculate results in real-time"
+  - "Segment explorer heatmap is interactive with drill-down modals"
+  - "Global economic assumptions affect all scenario calculations"
+  - "Application deploys successfully to AWS Amplify"
+  - "Lighthouse score: Performance >90, Accessibility >95"
+  - "No TypeScript errors in production build"
+  - "All data properly scaled from telco-churn_v2 (6,714x factor)"
+  - "Demo script covers all tabs with timing and talking points"
+  - "Design matches Kearney brand (dark theme, purple accents, Inter font)"
+  - "NO gridlines on any charts"
+  - "NO emojis in UI"
+  - "Text is readable (white/gray, NOT purple on black)"
+
+data_sources:
+  telco_churn_v2_results:
+    path: /Users/pfay01/Projects/telco-churn_v2
+    files:
+      - artifacts/model_leaderboard.csv
+      - artifacts/complete_metrics.json
+      - artifacts/segment_optimal_thresholds.csv
+      - results/scored_FIXED.csv
+      - docs/qa_report.md
+      - docs/test_results.md
+    scaling:
+      base_customers: 7044
+      target_customers: 47300000
+      scale_factor: 6714
+      maintain_distributions: true
+      segment_aggregation: true
+
+technical_decisions:
+  why_react:
+    - "Most popular framework for hiring/maintenance"
+    - "Rich ecosystem for D3.js integration"
+    - "TypeScript support for type safety"
+    - "Vite for fast development experience"
+
+  why_d3js:
+    - "Full control over chart appearance (dark theme compliance)"
+    - "Custom interactions (heatmap drill-down)"
+    - "No gridlines or unwanted styling"
+    - "Professional, publication-quality visualizations"
+
+  why_static_data:
+    - "Demo purposes only (no live inference needed)"
+    - "Faster performance (no API latency)"
+    - "Simpler deployment (no backend infrastructure)"
+    - "Predictable behavior for presentations"
+
+  why_tailwind:
+    - "Utility-first for rapid prototyping"
+    - "Easy to enforce design system (dark theme)"
+    - "No CSS-in-JS overhead"
+    - "Consistent spacing/sizing"
+
+  why_amplify:
+    - "Simple static hosting for React SPAs"
+    - "CI/CD integration with GitHub"
+    - "CloudFront CDN for performance"
+    - "Cost-effective for demo projects"
+
+success_metrics:
+  technical:
+    - "Build time: <30 seconds"
+    - "Bundle size: <500KB gzipped"
+    - "Lighthouse performance: >90"
+    - "Lighthouse accessibility: >95"
+    - "Zero TypeScript errors"
+    - "Zero console errors in production"
+
+  business:
+    - "Demo completion rate: 100% (all tabs reviewed)"
+    - "Executive feedback: 4.5+/5.0"
+    - "Time to key insight: <3 minutes"
+    - "Question answering: <30 seconds (with demo script)"
+    - "Follow-up meeting conversion: >50%"
+
+risks:
+  - risk: "D3.js learning curve for developers unfamiliar with it"
+    mitigation: "Use D3.js examples, focus on simple charts first, iterate"
+
+  - risk: "Scaling data 6,714x may produce unrealistic distributions"
+    mitigation: "Validate scaled distributions match original percentages"
+
+  - risk: "Dark theme readability issues (purple text on black)"
+    mitigation: "Use white/gray text, purple only for accents"
+
+  - risk: "Scenario calculations may be too slow in browser"
+    mitigation: "Pre-calculate common scenarios, optimize JavaScript"
+
+  - risk: "AWS Amplify deployment issues with Vite"
+    mitigation: "Use proven amplify.yml pattern, test early"
+
+  - risk: "2-week timeline is aggressive for 5 tabs + 7 charts"
+    mitigation: "Use orchestrator workflow, focus on MVP first, polish later"
+
+notes: |
+  DESIGN PRINCIPLES:
+  - "Label-first": Chart titles, axis labels, and legends are primary navigation
+  - "Data-ink ratio": Minimize non-data elements (no gridlines, subtle axes)
+  - "Executive-appropriate": Professional, serious, no gimmicks
+  - "Accessible": High contrast, keyboard navigable, screen reader friendly
+  - "Performance": Fast loading, smooth interactions, optimized assets
+
+  BRAND COMPLIANCE:
+  - Kearney purple (#7823DC) is an ACCENT color, not a text color
+  - Use white (#FFFFFF) for headings, light gray (#E5E5E5) for body text
+  - Pure black (#0A0A0A) background for maximum contrast
+  - Inter font (Google Fonts, modern UI font with excellent readability)
+  - NO gridlines (cleaner, more executive-friendly)
+  - NO emojis (maintain professional tone)
+
+  DATA SCALING APPROACH:
+  1. Load telco-churn_v2 results (7,044 customers)
+  2. Multiply customer counts by 6,714 (= 47.3M total)
+  3. Keep percentages/rates identical (churn rate, targeting rate, etc.)
+  4. Scale financial metrics (revenue, costs, savings)
+  5. Aggregate to segment level (54 segments)
+  6. Generate static JSON for demo
+
+  SCENARIO CALCULATION LOGIC:
+  - Contract Conversion: Reduces M2M churn by X%, costs $Y per conversion
+  - Onboarding Excellence: Reduces 0-12mo churn by X%, costs $Y investment
+  - Budget Optimization: Targets N customers, calculates ROI curve with diminishing returns
+  - All scenarios use global economic assumptions (ARPU, LTV, margin, etc.)
+
+  AGENTIC AI MESSAGING:
+  - "Data Agent: Ingests 47.3M customer records, identifies 54 segments"
+  - "ML Agent: Trains 6 models in parallel, selects best performer (LR, AUC 0.85)"
+  - "Strategy Agent: Optimizes thresholds per segment, generates retention strategies"
+  - "QA Agent: Validates results, approves for production deployment"
+  - Value: AI handles 80% of work → consultants focus on strategic recommendations
+
+  KEARNEY DIFFERENTIATION:
+  - Traditional: 12-week engagement, static Excel, one-time insights, $2M cost
+  - Kearney + AI: 2-week deployment, real-time intelligence, continuous optimization, $500K cost
+  - Result: 6x faster, 4x cheaper, higher accuracy, adaptive strategies

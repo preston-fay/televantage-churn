@@ -1,0 +1,11 @@
+[2025-10-27 15:25:11] [INFO] Started run 20251027_152511
+[2025-10-27 15:25:11] [INFO] Current phase: planning
+[2025-10-27 15:25:11] [INFO] Loaded intake: intake.yaml
+[2025-10-27 15:25:16] [INFO] Running phase: planning
+[2025-10-27 15:25:16] [INFO] Invoking agent: architect (phase: planning)
+[2025-10-27 15:25:16] [ERROR] Agent architect error: Prompt template not found: /Users/pfay01/Projects/televantage-churn-demo/subagent_prompts/architect.md
+[2025-10-27 15:25:16] [ERROR] Agent architect failed
+[2025-10-27 15:25:16] [INFO] Consensus request generated: /Users/pfay01/Projects/televantage-churn-demo/.claude/consensus/REQUEST.md
+[2025-10-27 15:25:16] [INFO] Consensus required for phase: planning
+[2025-10-27 15:25:16] [INFO] Phase planning requires consensus
+[2025-10-27 15:25:33] [INFO] Run aborted by user

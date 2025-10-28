@@ -1,0 +1,64 @@
+{
+  "models": [
+    {
+      "name": "Logistic Regression (ElasticNet)",
+      "abbrev": "LR_en",
+      "auc": 0.85,
+      "brier": 0.134,
+      "average_precision": 0.6656,
+      "training_time_seconds": 3.96,
+      "winner": true,
+      "rationale": "Best AUC (0.8500), highly interpretable coefficients, fast inference"
+    },
+    {
+      "name": "CatBoost",
+      "abbrev": "CB",
+      "auc": 0.8456,
+      "brier": 0.137,
+      "average_precision": 0.6617,
+      "training_time_seconds": 3.08,
+      "winner": false,
+      "rationale": "Strong AUC (0.8456), handles missing data well, but less interpretable"
+    },
+    {
+      "name": "Neural Network (MLP)",
+      "abbrev": "MLP",
+      "auc": 0.8433,
+      "brier": 0.1379,
+      "average_precision": 0.6522,
+      "training_time_seconds": 1.1,
+      "winner": false,
+      "rationale": "Good performance (0.8433), but black-box model, harder to explain"
+    },
+    {
+      "name": "XGBoost",
+      "abbrev": "XGB",
+      "auc": 0.8399,
+      "brier": 0.1397,
+      "average_precision": 0.6617,
+      "training_time_seconds": 2.82,
+      "winner": false,
+      "rationale": "Competitive (0.8399), gradient boosting power, moderate interpretability"
+    },
+    {
+      "name": "Random Forest",
+      "abbrev": "RF",
+      "auc": 0.8378,
+      "brier": 0.1392,
+      "average_precision": 0.6447,
+      "training_time_seconds": 2.24,
+      "winner": false,
+      "rationale": "Solid baseline (0.8378), robust to overfitting, ensemble benefits"
+    },
+    {
+      "name": "LightGBM",
+      "abbrev": "LGB",
+      "auc": 0.8371,
+      "brier": 0.1407,
+      "average_precision": 0.6524,
+      "training_time_seconds": 9.04,
+      "winner": false,
+      "rationale": "Fast training (0.8371), memory efficient, but slightly lower AUC"
+    }
+  ]
+}

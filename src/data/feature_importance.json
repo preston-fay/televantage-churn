@@ -1,0 +1,54 @@
+{
+  "features": [
+    {
+      "name": "Contract Type",
+      "importance": 0.287,
+      "interpretation": "Month-to-month contracts 5x more likely to churn"
+    },
+    {
+      "name": "Tenure",
+      "importance": 0.219,
+      "interpretation": "Customers with <12 months tenure highest risk"
+    },
+    {
+      "name": "Monthly Charges",
+      "importance": 0.156,
+      "interpretation": "High bills ($75+) correlate with churn"
+    },
+    {
+      "name": "Total Charges",
+      "importance": 0.098,
+      "interpretation": "Low lifetime value indicates early churn risk"
+    },
+    {
+      "name": "Tech Support Calls",
+      "importance": 0.085,
+      "interpretation": "3+ calls in 90 days signals dissatisfaction"
+    },
+    {
+      "name": "Payment Method",
+      "importance": 0.064,
+      "interpretation": "Electronic check users churn 2x more"
+    },
+    {
+      "name": "Internet Service",
+      "importance": 0.041,
+      "interpretation": "Fiber users churn less than DSL"
+    },
+    {
+      "name": "Online Security",
+      "importance": 0.023,
+      "interpretation": "No security add-ons = higher churn"
+    },
+    {
+      "name": "Streaming Services",
+      "importance": 0.019,
+      "interpretation": "No streaming subscriptions = lower engagement"
+    },
+    {
+      "name": "Paperless Billing",
+      "importance": 0.008,
+      "interpretation": "Minimal impact on churn"
+    }
+  ]
+}
