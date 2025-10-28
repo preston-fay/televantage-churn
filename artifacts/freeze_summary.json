@@ -1,0 +1,11 @@
+{
+  "repo": "preston-fay/televantage-churn",
+  "freeze_branch": "demo-freeze-2025-10-28",
+  "stable_tag": "v2025.10.28-ai-demo-stable",
+  "current_sha": "a5020b7",
+  "previous_branch": "claude/session-011CUZi11CFxX1t5fSX9AWK3",
+  "zip_artifact": "artifacts/releases/AI_DEMO_2025_10_28.zip",
+  "release_url": "",
+  "created_at": "2025-10-28",
+  "restore_command": "./scripts/restore-stable.sh v2025.10.28-ai-demo-stable"
+}

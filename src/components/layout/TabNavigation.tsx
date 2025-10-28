@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 const tabs = [
   { path: '/', label: 'Dashboard' },
   { path: '/scenarios', label: 'Scenarios' },
-  { path: '/workflow', label: 'AI Workflow' },
+  { path: '/workflow', label: 'AI Intelligence' },
   { path: '/analytics', label: 'Analytics' },
   { path: '/segments', label: 'Segments' },
 ];

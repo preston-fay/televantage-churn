@@ -4,7 +4,7 @@ import { AppProvider } from './context/AppContext';
 import Header from './components/layout/Header';
 import ExecutiveDashboard from './tabs/ExecutiveDashboard';
 import ScenarioPlanner from './tabs/ScenarioPlanner';
-import AgenticWorkflow from './tabs/AgenticWorkflow';
+import AIPoweredIntelligence from './tabs/AIPoweredIntelligence';
 import ModelingDeepDive from './tabs/ModelingDeepDive';
 import SegmentExplorer from './tabs/SegmentExplorer';
 
@@ -18,7 +18,7 @@ function App() {
             <Routes>
               <Route path="/" element={<ExecutiveDashboard />} />
               <Route path="/scenarios" element={<ScenarioPlanner />} />
-              <Route path="/workflow" element={<AgenticWorkflow />} />
+              <Route path="/workflow" element={<AIPoweredIntelligence />} />
               <Route path="/analytics" element={<ModelingDeepDive />} />
               <Route path="/segments" element={<SegmentExplorer />} />
             </Routes>
