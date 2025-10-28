@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, X, Sparkles } from 'lucide-react';
-import { aiService, ChartData } from '@/services/aiService';
+import { aiService } from '@/services/aiServiceV2';
+import type { ChartData } from '@/services/aiService';
 import BarChart from '@/components/charts/BarChart';
 import DonutChart from '@/components/charts/DonutChart';
 import HorizontalBarChart from '@/components/charts/HorizontalBarChart';
@@ -63,8 +64,7 @@ export default function StrategyCopilot({ onClose, embedded = false }: StrategyC
         role: 'assistant',
         content: response.answer,
         citations: response.citations,
-        relatedSegments: response.relatedSegments,
-        chart: response.chart,
+        chart: response.chart as ChartData | undefined,
         followUps: response.followUps,
         timestamp: Date.now(),
       };

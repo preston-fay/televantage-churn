@@ -3,7 +3,7 @@ import { Sparkles, BarChart3, TrendingUp, Users } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import StrategyCopilot from '@/components/copilot/StrategyCopilot';
 import PoweredByAgents from '@/components/shared/PoweredByAgents';
-import { aiService } from '@/services/aiService';
+import { aiService } from '@/services/aiServiceV2';
 
 export default function AIPoweredIntelligence() {
   const { data } = useAppContext();
