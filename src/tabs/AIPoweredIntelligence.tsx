@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BarChart3, Bot, Lightbulb, CheckCircle, Check, Zap, Clock } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
+import StrategyCopilot from '@/components/copilot/StrategyCopilot';
+import { aiService } from '@/services/aiService';
 
 export default function AIPoweredIntelligence() {
+  const { data } = useAppContext();
+
+  // Initialize AI service with knowledge base
+  useEffect(() => {
+    if (data) {
+      aiService.setContext(data);
+    }
+  }, [data]);
+
   const agents = [
     {
       name: 'Data Agent',
@@ -342,6 +354,31 @@ export default function AIPoweredIntelligence() {
           <p className="text-text-secondary text-lg leading-relaxed">
             <strong className="text-text-primary">Strategic Implication:</strong> The agentic workflow compresses traditional consulting timelines from quarters to weeks, enabling telcos to respond to competitive threats in near real-time. This speed advantage—combined with maintained analytical rigor and governance—represents a fundamental shift in how retention strategy is developed and deployed.
           </p>
+        </div>
+      </div>
+
+      {/* Strategy Copilot Section */}
+      <div className="card mb-12 border-2" style={{ borderColor: 'var(--color-accent-primary)' }}>
+        <div className="flex items-start space-x-4 mb-6">
+          <div
+            className="flex-shrink-0 w-14 h-14 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: 'var(--color-accent-primary)' }}
+          >
+            <Zap size={32} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-2xl font-semibold text-text-primary mb-3">
+              Try Our Strategy Copilot
+            </h3>
+            <p className="text-text-secondary leading-relaxed">
+              Ask questions about customer segments, churn drivers, retention strategies, and ROI projections. The Copilot uses our multi-agent platform to provide data-driven answers with citations and related segment recommendations.
+            </p>
+          </div>
+        </div>
+
+        {/* Embedded Copilot */}
+        <div className="h-[600px]">
+          <StrategyCopilot embedded />
         </div>
       </div>
     </div>
