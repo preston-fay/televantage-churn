@@ -14,22 +14,22 @@ const calloutConfig = {
     icon: Lightbulb,
     defaultTitle: 'Key Insight',
     bgColor: 'rgba(120, 35, 220, 0.1)',
-    borderColor: '#C8A5F0',
-    iconColor: '#C8A5F0',
+    borderColor: '#7823DC',
+    iconColor: '#7823DC',
   },
   counterintuitive: {
     icon: Zap,
     defaultTitle: 'Counterintuitive Finding',
     bgColor: 'rgba(200, 165, 240, 0.1)',
-    borderColor: '#C8A5F0',
-    iconColor: '#C8A5F0',
+    borderColor: '#7823DC',
+    iconColor: '#7823DC',
   },
   opportunity: {
     icon: Target,
     defaultTitle: 'Hidden Opportunity',
     bgColor: 'rgba(120, 35, 220, 0.1)',
-    borderColor: '#C8A5F0',
-    iconColor: '#C8A5F0',
+    borderColor: '#7823DC',
+    iconColor: '#7823DC',
   },
 };
 

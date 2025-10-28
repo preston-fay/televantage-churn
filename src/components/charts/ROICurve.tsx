@@ -89,13 +89,13 @@ export default function ROICurve({
     gradient
       .append('stop')
       .attr('offset', '0%')
-      .attr('stop-color', '#C8A5F0')
+      .attr('stop-color', '#7823DC')
       .attr('stop-opacity', 0.8);
 
     gradient
       .append('stop')
       .attr('offset', '100%')
-      .attr('stop-color', '#C8A5F0')
+      .attr('stop-color', '#7823DC')
       .attr('stop-opacity', 0);
 
     // Draw line
@@ -103,7 +103,7 @@ export default function ROICurve({
       .append('path')
       .datum(data)
       .attr('fill', 'none')
-      .attr('stroke', '#C8A5F0')
+      .attr('stroke', '#7823DC')
       .attr('stroke-width', 3)
       .attr('d', line);
 
@@ -120,7 +120,7 @@ export default function ROICurve({
       .attr('cx', xScale(optimalPoint.budget))
       .attr('cy', yScale(optimalPoint.roi))
       .attr('r', 8)
-      .attr('fill', '#C8A5F0')
+      .attr('fill', '#7823DC')
       .attr('stroke', '#0A0A0A')
       .attr('stroke-width', 3);
 
@@ -131,7 +131,7 @@ export default function ROICurve({
       .attr('x2', xScale(optimalPoint.budget))
       .attr('y1', yScale(optimalPoint.roi))
       .attr('y2', chartHeight)
-      .attr('stroke', '#C8A5F0')
+      .attr('stroke', '#7823DC')
       .attr('stroke-width', 2)
       .attr('stroke-dasharray', '4,4')
       .attr('opacity', 0.6);
@@ -158,7 +158,7 @@ export default function ROICurve({
       .attr('cx', d => xScale(d.budget))
       .attr('cy', d => yScale(d.roi))
       .attr('r', 4)
-      .attr('fill', '#C8A5F0')
+      .attr('fill', '#7823DC')
       .attr('opacity', 0)
       .style('cursor', 'pointer')
       .on('mouseenter', function (event, d) {

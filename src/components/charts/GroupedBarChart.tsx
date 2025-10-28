@@ -25,7 +25,7 @@ export default function GroupedBarChart({
   height = 400,
   yAxisLabel = 'Score',
   metrics = [],
-  colors = ['#C8A5F0', '#9150E1', '#C8A5F0'], // Kearney purple gradient
+  colors = ['#7823DC', '#9150E1', '#7823DC'], // Kearney purple gradient
 }: GroupedBarChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);

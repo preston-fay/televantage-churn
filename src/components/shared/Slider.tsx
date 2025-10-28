@@ -38,7 +38,7 @@ export default function Slider({
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="w-full h-2 bg-bg-tertiary rounded-lg appearance-none cursor-pointer accent-accent-primary"
         style={{
-          background: `linear-gradient(to right, #C8A5F0 0%, #C8A5F0 ${
+          background: `linear-gradient(to right, #7823DC 0%, #7823DC ${
             ((value - min) / (max - min)) * 100
           }%, #2A2A2A ${((value - min) / (max - min)) * 100}%, #2A2A2A 100%)`,
         }}

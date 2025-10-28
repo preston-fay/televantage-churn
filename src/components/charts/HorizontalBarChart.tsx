@@ -22,7 +22,7 @@ export default function HorizontalBarChart({
   height = 400,
   xAxisLabel = '',
   valueFormatter = (v) => v.toFixed(2),
-  color = '#C8A5F0', // Kearney purple
+  color = '#7823DC', // Kearney purple
 }: HorizontalBarChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);

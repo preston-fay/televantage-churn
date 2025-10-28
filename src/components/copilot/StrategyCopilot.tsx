@@ -164,7 +164,7 @@ export default function StrategyCopilot({ onClose, embedded = false }: StrategyC
                           height={message.chart.config?.height || 350}
                           yAxisLabel={message.chart.config?.yAxisLabel}
                           valueFormatter={message.chart.config?.valueFormatter}
-                          highlightColor="#C8A5F0"
+                          highlightColor="#7823DC"
                         />
                       )}
                       {message.chart.type === 'horizontal-bar' && (

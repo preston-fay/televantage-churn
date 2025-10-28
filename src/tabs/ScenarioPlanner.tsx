@@ -141,7 +141,7 @@ export default function ScenarioPlanner() {
 
     return [
       { name: 'Before', data: beforeSeries, color: '#A5A5A5' },
-      { name: 'After Onboarding Program', data: afterSeries, color: '#C8A5F0' },
+      { name: 'After Onboarding Program', data: afterSeries, color: '#7823DC' },
     ];
   }, [churnReduction]);
 
@@ -500,7 +500,7 @@ export default function ScenarioPlanner() {
               height={450}
               yAxisLabel="Churn Rate"
               valueFormatter={(v) => v.toFixed(1) + '%'}
-              highlightColor="#C8A5F0"
+              highlightColor="#7823DC"
             />
           </div>
           <div className="mt-4 text-center text-text-tertiary text-sm">
