@@ -1,12 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, X, Sparkles } from 'lucide-react';
-import { aiService } from '@/services/aiService';
+import { aiService, ChartData } from '@/services/aiService';
+import BarChart from '@/components/charts/BarChart';
+import DonutChart from '@/components/charts/DonutChart';
+import HorizontalBarChart from '@/components/charts/HorizontalBarChart';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   citations?: string[];
   relatedSegments?: string[];
+  chart?: ChartData;
   timestamp: number;
 }
 
@@ -59,6 +63,7 @@ export default function StrategyCopilot({ onClose, embedded = false }: StrategyC
         content: response.answer,
         citations: response.citations,
         relatedSegments: response.relatedSegments,
+        chart: response.chart,
         timestamp: Date.now(),
       };
 
@@ -83,10 +88,10 @@ export default function StrategyCopilot({ onClose, embedded = false }: StrategyC
   };
 
   const suggestedQuestions = [
-    "Why is the Medium Risk segment so large?",
-    "What should we do about month-to-month customers?",
-    "What's the optimal retention budget?",
-    "Tell me about early-tenure customers",
+    "Show me customer risk distribution",
+    "Compare ROI across all strategies",
+    "What are the top churn drivers?",
+    "Tell me about month-to-month customers",
   ];
 
   return (
@@ -139,6 +144,40 @@ export default function StrategyCopilot({ onClose, embedded = false }: StrategyC
                 >
                   <p className="text-sm leading-relaxed">{message.content}</p>
                 </div>
+
+                {/* Chart Visualization */}
+                {message.chart && (
+                  <div className="mt-3 p-4 rounded-lg bg-bg-secondary border border-border-primary">
+                    <div className="text-xs text-text-tertiary mb-3 font-semibold uppercase">{message.chart.title}</div>
+                    <div className="flex justify-center">
+                      {message.chart.type === 'donut' && (
+                        <DonutChart
+                          data={message.chart.data}
+                          width={message.chart.config?.width || 400}
+                          height={message.chart.config?.height || 350}
+                        />
+                      )}
+                      {message.chart.type === 'bar' && (
+                        <BarChart
+                          data={message.chart.data}
+                          width={message.chart.config?.width || 500}
+                          height={message.chart.config?.height || 350}
+                          yAxisLabel={message.chart.config?.yAxisLabel}
+                          valueFormatter={message.chart.config?.valueFormatter}
+                          highlightColor="#C8A5F0"
+                        />
+                      )}
+                      {message.chart.type === 'horizontal-bar' && (
+                        <HorizontalBarChart
+                          data={message.chart.data}
+                          width={message.chart.config?.width || 550}
+                          height={message.chart.config?.height || 400}
+                          valueFormatter={message.chart.config?.valueFormatter}
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Citations */}
                 {message.citations && message.citations.length > 0 && (

@@ -14,8 +14,8 @@ const calloutConfig = {
     icon: Lightbulb,
     defaultTitle: 'Key Insight',
     bgColor: 'rgba(120, 35, 220, 0.1)',
-    borderColor: '#7823DC',
-    iconColor: '#7823DC',
+    borderColor: '#C8A5F0',
+    iconColor: '#C8A5F0',
   },
   counterintuitive: {
     icon: Zap,
@@ -28,8 +28,8 @@ const calloutConfig = {
     icon: Target,
     defaultTitle: 'Hidden Opportunity',
     bgColor: 'rgba(120, 35, 220, 0.1)',
-    borderColor: '#7823DC',
-    iconColor: '#7823DC',
+    borderColor: '#C8A5F0',
+    iconColor: '#C8A5F0',
   },
 };
 

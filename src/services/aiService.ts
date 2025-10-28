@@ -12,10 +12,18 @@ import { AppData } from '@/types/index';
 
 type KnowledgeContext = AppData;
 
+export interface ChartData {
+  type: 'bar' | 'donut' | 'line' | 'horizontal-bar';
+  title: string;
+  data: any;
+  config?: any;
+}
+
 interface CopilotResponse {
   answer: string;
   citations: string[];
   relatedSegments?: string[];
+  chart?: ChartData;
 }
 
 export class AIService {
@@ -86,9 +94,25 @@ export class AIService {
     const highRisk = riskLevels.find(r => r.level === 'High');
     const veryHighRisk = riskLevels.find(r => r.level === 'Very High');
     const mediumRisk = riskLevels.find(r => r.level === 'Medium');
+    const lowRisk = riskLevels.find(r => r.level === 'Low');
 
     const totalHighRisk = (highRisk?.customers || 0) + (veryHighRisk?.customers || 0);
     const highRiskPct = ((totalHighRisk / totalCustomers) * 100).toFixed(1);
+
+    // Generate donut chart data for risk distribution
+    const chartData: ChartData = {
+      type: 'donut',
+      title: 'Customer Risk Distribution',
+      data: riskLevels.map(level => ({
+        label: level.level,
+        value: level.customers,
+        percentage: level.percentage
+      })),
+      config: {
+        width: 500,
+        height: 400
+      }
+    };
 
     if (question.includes('medium')) {
       if (!mediumRisk) {
@@ -98,16 +122,18 @@ export class AIService {
         };
       }
       return {
-        answer: `The Medium Risk segment contains ${(mediumRisk.customers / 1_000_000).toFixed(1)}M customers (${mediumRisk.percentage}% of base). These customers have 15-30% predicted churn probability. They represent a strategic opportunity: lower intervention costs than High Risk customers, but still significant retention value. Data Agent identified this segment using features like contract type, tenure, and service usage patterns. See the Executive Dashboard → Customer Risk Distribution chart for the full breakdown.`,
+        answer: `The Medium Risk segment contains ${(mediumRisk.customers / 1_000_000).toFixed(1)}M customers (${mediumRisk.percentage}% of base). These customers have 15-30% predicted churn probability. They represent a strategic opportunity: lower intervention costs than High Risk customers, but still significant retention value. Data Agent identified this segment using features like contract type, tenure, and service usage patterns.`,
         citations: ['Executive Dashboard', 'ML Agent (AUC 0.85)', 'Risk Distribution Analysis'],
         relatedSegments: ['Medium Risk cohort'],
+        chart: chartData
       };
     }
 
     return {
-      answer: `Our ML Agent (xgb_2025_09, AUC 0.85) identifies ${(totalHighRisk / 1_000_000).toFixed(1)}M customers (${highRiskPct}%) as High or Very High Risk for churn. These customers have >30% predicted churn probability and represent our primary intervention targets. The Data Agent segments this population across 54 customer cohorts, with highest concentration in month-to-month contracts (42% of base) and early-tenure customers (0-3 months, 40% churn rate). Strategy Agent recommends precision targeting: allocate $220M retention budget to the 4.4M highest-value at-risk customers for $571M annual retention value (160% ROI). See Scenarios → Budget Optimization for interactive modeling.`,
+      answer: `Our ML Agent (xgb_2025_09, AUC 0.85) identifies ${(totalHighRisk / 1_000_000).toFixed(1)}M customers (${highRiskPct}%) as High or Very High Risk for churn. These customers have >30% predicted churn probability and represent our primary intervention targets. The chart shows the full risk distribution across all customer segments.`,
       citations: ['ML Agent Risk Scoring', 'Segment Explorer', 'Scenario Planner'],
       relatedSegments: ['High Risk', 'Very High Risk', 'Month-to-Month', 'Early Tenure (0-3mo)'],
+      chart: chartData
     };
   }
 
@@ -146,23 +172,58 @@ export class AIService {
     const features = this.context!.feature_importance.features;
     const topFeature = features[0];
 
+    // Generate horizontal bar chart for top 10 features
+    const chartData: ChartData = {
+      type: 'horizontal-bar',
+      title: 'Top 10 Churn Drivers',
+      data: features.slice(0, 10).map(f => ({
+        name: f.name,
+        value: f.importance * 100,
+        interpretation: f.interpretation
+      })),
+      config: {
+        width: 600,
+        height: 450,
+        valueFormatter: (v: number) => `${v.toFixed(1)}%`
+      }
+    };
+
     return {
-      answer: `The ML Agent (xgb_2025_09) identified the top churn driver as "${topFeature.name}" with ${(topFeature.importance * 100).toFixed(1)}% predictive weight. Interpretation: ${topFeature.interpretation}. The complete feature importance ranking shows 10 key drivers: contract type (14.2%), tenure (11.8%), service usage patterns (9.3%), billing history (8.1%), support interactions (7.4%), payment method (6.2%), plan type (5.8%), and competitive activity (5.1%). QA Agent validated that all features are business-actionable and compliant with data governance policies. See Analytics → Feature Importance (section 4C) for the full breakdown with business translations.`,
+      answer: `The ML Agent (xgb_2025_09) identified the top churn driver as "${topFeature.name}" with ${(topFeature.importance * 100).toFixed(1)}% predictive weight. Interpretation: ${topFeature.interpretation}. The chart shows the complete top 10 feature ranking. QA Agent validated that all features are business-actionable and compliant with data governance policies.`,
       citations: ['ML Agent Feature Importance', 'Analytics Deep-Dive', 'QA Agent Validation'],
+      chart: chartData
     };
   }
 
   private answerROIQuestion(question: string): CopilotResponse {
     if (question.includes('optimal') || question.includes('best') || question.includes('220')) {
       return {
-        answer: `Strategy Agent identified $220M as the optimal annual retention budget through marginal ROI analysis. At this allocation point: (1) Cost per intervention: $50 average, (2) Customers targeted: 4.4M highest-risk/highest-value, (3) Expected saves: 1.32M customers (30% save rate), (4) Annual retention value: $571M, (5) ROI: 160%. Beyond $220M, marginal returns decline as we exhaust high-probability saves and target lower-value customers. Below $220M, we miss high-value opportunities. The ROI curve in Scenarios → Budget Optimization visualizes this inflection point. QA Agent validated that this allocation respects operational capacity constraints and budget guardrails.`,
+        answer: `Strategy Agent identified $220M as the optimal annual retention budget through marginal ROI analysis. At this allocation point: (1) Cost per intervention: $50 average, (2) Customers targeted: 4.4M highest-risk/highest-value, (3) Expected saves: 1.32M customers (30% save rate), (4) Annual retention value: $571M, (5) ROI: 160%. Beyond $220M, marginal returns decline as we exhaust high-probability saves and target lower-value customers.`,
         citations: ['Strategy Agent Optimization', 'Scenario Planner', 'QA Agent Validation'],
       };
     }
 
+    // Generate bar chart comparing the 3 scenarios
+    const chartData: ChartData = {
+      type: 'bar',
+      title: 'ROI Comparison Across Retention Strategies',
+      data: [
+        { category: 'Budget\nOptimization', value: 160, label: '$571M savings' },
+        { category: 'Contract\nConversion', value: 112, label: '$223M savings' },
+        { category: 'Onboarding\nExcellence', value: 96, label: '$98M savings' }
+      ],
+      config: {
+        width: 550,
+        height: 400,
+        valueFormatter: (v: number) => `${v}%`,
+        yAxisLabel: 'ROI (%)'
+      }
+    };
+
     return {
-      answer: `Strategy Agent projects three retention initiatives with distinct ROI profiles: (1) Precision Retention Targeting: $220M investment → $571M annual savings → 160% ROI → 3-month payback, (2) Contract Conversion Program: $199M investment → $223M annual savings → 100% ROI → 6-month payback, (3) Onboarding Excellence: $50M investment → $98M annual savings → 96% ROI → 12-month payback. Combined portfolio delivers $892M annual retention value against $469M investment (90% blended ROI). QA Agent confirmed all initiatives meet minimum ROI threshold (50%) and align with strategic priorities. See Executive Dashboard → Strategic Retention Roadmap for implementation timelines.`,
+      answer: `Strategy Agent projects three retention initiatives with distinct ROI profiles: (1) Budget Optimization: $220M investment → $571M savings → 160% ROI, (2) Contract Conversion: $199M investment → $223M savings → 112% ROI, (3) Onboarding Excellence: $50M investment → $98M savings → 96% ROI. Combined portfolio delivers $892M annual retention value against $469M investment (90% blended ROI). The chart compares ROI across all three strategies.`,
       citations: ['Strategy Agent Portfolio Analysis', 'Executive Dashboard', 'QA Agent Validation'],
+      chart: chartData
     };
   }
 

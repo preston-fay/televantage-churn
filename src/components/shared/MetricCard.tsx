@@ -22,7 +22,7 @@ export default function MetricCard({
   };
 
   const trendColors = {
-    up: '#7823DC',      // Kearney primary purple
+    up: '#C8A5F0',      // Kearney primary purple
     down: '#D2D2D2',    // Kearney gray (neutral, not alarming red)
     neutral: '#A5A5A5', // Kearney gray
   };

@@ -156,3 +156,15 @@ export function generateROICurve(
 
   return points;
 }
+
+// Generate multiple ROI curves for comparison
+export function generateMultipleROICurves(
+  costScenarios: number[],
+  assumptions: GlobalAssumptions,
+  steps: number = 20
+): { cost: number; points: ROIPoint[] }[] {
+  return costScenarios.map(cost => ({
+    cost,
+    points: generateROICurve(cost, assumptions, steps)
+  }));
+}
