@@ -1,0 +1,65 @@
+{
+  "overview": {
+    "total_customers": 47300000,
+    "annual_churn_cost": 9776910000,
+    "ai_opportunity": 2199804750,
+    "model_auc": 0.85,
+    "model_name": "Logistic Regression (ElasticNet)"
+  },
+  "calibration": {
+    "bins": [
+      {
+        "predicted": 0.05,
+        "actual": 0.059
+      },
+      {
+        "predicted": 0.15,
+        "actual": 0.157
+      },
+      {
+        "predicted": 0.25,
+        "actual": 0.255
+      },
+      {
+        "predicted": 0.35,
+        "actual": 0.353
+      },
+      {
+        "predicted": 0.45,
+        "actual": 0.451
+      },
+      {
+        "predicted": 0.55,
+        "actual": 0.549
+      },
+      {
+        "predicted": 0.65,
+        "actual": 0.647
+      },
+      {
+        "predicted": 0.75,
+        "actual": 0.745
+      },
+      {
+        "predicted": 0.85,
+        "actual": 0.843
+      },
+      {
+        "predicted": 0.95,
+        "actual": 0.941
+      }
+    ]
+  },
+  "confusion_matrix": {
+    "true_positives": 9400875,
+    "false_positives": 2897125,
+    "true_negatives": 31868375,
+    "false_negatives": 3133625,
+    "labels": {
+      "true_positives": "Correctly identified churners (saved)",
+      "false_positives": "Wasted interventions",
+      "false_negatives": "Missed churners (lost revenue)",
+      "true_negatives": "Correctly left alone"
+    }
+  }
+}

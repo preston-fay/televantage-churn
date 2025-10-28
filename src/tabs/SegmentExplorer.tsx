@@ -3,7 +3,6 @@ import { useAppContext } from '@/context/AppContext';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ChartContainer from '@/components/shared/ChartContainer';
 import Heatmap from '@/components/charts/Heatmap';
-import segmentsData from '@/data/segments.json';
 import { formatCurrency } from '@/utils/formatters';
 import InsightCard from '@/components/shared/InsightCard';
 import CalloutBox from '@/components/shared/CalloutBox';
@@ -56,29 +55,31 @@ const getCustomerStory = (segment: Segment): { name: string; story: string } | n
 };
 
 export default function SegmentExplorer() {
-  const { isLoading, error } = useAppContext();
+  const { data, isLoading, error } = useAppContext();
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
 
   // Prepare heatmap data
   const heatmapData = useMemo(() => {
-    return segmentsData.segments
-      .filter(s => s.tenure_band !== 'unknown' && s.contract_group !== 'unknown')
-      .map(segment => ({
+    if (!data?.segments) return [];
+    return data.segments
+      .filter((s: any) => s.tenure_band !== 'unknown' && s.contract_group !== 'unknown')
+      .map((segment: any) => ({
         x: segment.tenure_band,
         y: segment.contract_group,
         value: segment.churn_probability,
         size: segment.customers,
         data: segment,
       }));
-  }, []);
+  }, [data]);
 
   // Find high-risk segments
   const highRiskSegments = useMemo(() => {
-    return segmentsData.segments
-      .filter(s => s.risk_level === 'Very High' || s.risk_level === 'High')
-      .sort((a, b) => b.customers - a.customers)
+    if (!data?.segments) return [];
+    return data.segments
+      .filter((s: any) => s.risk_level === 'Very High' || s.risk_level === 'High')
+      .sort((a: any, b: any) => b.customers - a.customers)
       .slice(0, 5);
-  }, []);
+  }, [data]);
 
   if (isLoading) {
     return <LoadingSpinner message="Loading segment data..." />;
@@ -124,14 +125,14 @@ export default function SegmentExplorer() {
           <div className="p-5 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
             <div className="text-text-tertiary text-sm font-medium mb-2">Total Segments Analyzed</div>
             <div className="text-text-primary font-bold text-3xl mb-1">
-              {segmentsData.segments.length - 1}
+              {(data?.segments?.length || 1) - 1}
             </div>
             <div className="text-text-secondary text-sm">Across 3 dimensions</div>
           </div>
           <div className="p-5 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
             <div className="text-text-tertiary text-sm font-medium mb-2">High-Priority Segments</div>
             <div className="text-text-primary font-bold text-3xl mb-1">
-              {segmentsData.segments.filter(s => s.risk_level === 'High' || s.risk_level === 'Very High').length}
+              {data?.segments?.filter((s: any) => s.risk_level === 'High' || s.risk_level === 'Very High').length || 0}
             </div>
             <div className="text-text-secondary text-sm">Requiring immediate action</div>
           </div>
@@ -143,7 +144,7 @@ export default function SegmentExplorer() {
           <div className="p-5 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
             <div className="text-text-tertiary text-sm font-medium mb-2">AI-Targeted Customers</div>
             <div className="text-text-primary font-bold text-3xl mb-1">
-              {(segmentsData.segments.reduce((sum, s) => sum + s.targeted_customers, 0) / 1_000_000).toFixed(1)}M
+              {((data?.segments?.reduce((sum: number, s: any) => sum + s.targeted_customers, 0) || 0) / 1_000_000).toFixed(1)}M
             </div>
             <div className="text-text-secondary text-sm">Precision targeting enabled</div>
           </div>

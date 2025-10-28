@@ -8,17 +8,16 @@ import LineChart from '@/components/charts/LineChart';
 import InsightCard from '@/components/shared/InsightCard';
 import CalloutBox from '@/components/shared/CalloutBox';
 import MetricCard from '@/components/shared/MetricCard';
-import modelsData from '@/data/models.json';
-import featureImportanceData from '@/data/feature_importance.json';
 import { Trophy, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function ModelingDeepDive() {
-  const { isLoading, error } = useAppContext();
+  const { data, isLoading, error } = useAppContext();
   const [expandedSection, setExpandedSection] = useState<number | null>(null);
 
   // Prepare Model Zoo grouped bar chart data
   const modelZooData = useMemo(() => {
-    return modelsData.models.map(model => ({
+    if (!data?.models) return [];
+    return data.models.map((model: any) => ({
       group: model.abbrev,
       values: [
         { metric: 'AUC', value: model.auc },
@@ -27,16 +26,17 @@ export default function ModelingDeepDive() {
       ],
       highlight: model.winner,
     }));
-  }, []);
+  }, [data]);
 
   // Prepare Feature Importance data
   const featureData = useMemo(() => {
-    return featureImportanceData.features.map(feature => ({
+    if (!data?.feature_importance?.features) return [];
+    return data.feature_importance.features.map((feature: any) => ({
       label: feature.name,
       value: feature.importance,
       subtitle: feature.interpretation,
     }));
-  }, []);
+  }, [data]);
 
   // Prepare Calibration Plot data
   const calibrationData = useMemo(() => {
@@ -112,7 +112,11 @@ export default function ModelingDeepDive() {
     );
   }
 
-  const winnerModel = modelsData.models.find(m => m.winner)!;
+  const winnerModel = data?.models?.find((m: any) => m.winner);
+
+  if (!data || !winnerModel) {
+    return <LoadingSpinner message="Loading analytics data..." />;
+  }
 
   return (
     <div className="container mx-auto px-6 py-8 max-w-7xl">
@@ -549,7 +553,7 @@ export default function ModelingDeepDive() {
             </ChartContainer>
 
             <div className="mt-8 space-y-6">
-              {featureImportanceData.features.slice(0, 5).map((feature, idx) => (
+              {data?.feature_importance?.features?.slice(0, 5).map((feature: any, idx: number) => (
                 <div key={idx} className="p-6 rounded-lg" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>
                   <div className="flex justify-between items-start mb-3">
                     <h4 className="text-xl font-semibold text-text-primary">#{idx + 1}: {feature.name}</h4>
