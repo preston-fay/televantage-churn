@@ -1,30 +1,19 @@
 /**
- * Lightweight Retrieval Service
- *
- * Uses MiniSearch for fast term lookup in glossary, features, and segments.
- * Helps copilot use correct telco terminology in explanations.
+ * Retrieval Module
+ * Lightweight search over glossary, features, and segments using MiniSearch
  */
 
 import MiniSearch from "minisearch";
 
-let searchIndex: MiniSearch | null = null;
+let index: MiniSearch | null = null;
 
-interface Document {
-  id: string;
-  kind: "glossary" | "feature" | "segment";
-  term: string;
-  text: string;
-}
+export function buildIndex(glossary: any[], features: any[], segments: any[]) {
+  index = new MiniSearch({
+    fields: ["term", "text"],
+    storeFields: ["kind", "term", "text"]
+  });
 
-/**
- * Build search index from glossary, features, and segments
- */
-export function buildIndex(
-  glossary: Array<{ term: string; def: string }>,
-  features: any[],
-  segments: any[]
-) {
-  const docs: Document[] = [];
+  const docs: any[] = [];
 
   // Add glossary terms
   glossary.forEach((g, i) => {
@@ -32,7 +21,7 @@ export function buildIndex(
       id: `g${i}`,
       kind: "glossary",
       term: g.term,
-      text: g.def
+      text: g.def || g.definition || ""
     });
   });
 
@@ -41,94 +30,40 @@ export function buildIndex(
     docs.push({
       id: `f${i}`,
       kind: "feature",
-      term: f.name || f.feature || `Feature ${i}`,
-      text: f.interpretation || f.definition || f.name || ""
+      term: f.feature || f.name || f.label || "",
+      text: f.definition || f.interpretation || String(f.feature || f.name || "")
     });
   });
 
   // Add segments
   segments.forEach((s, i) => {
-    const segmentName = `${s.tenure_band} | ${s.contract_group} | ${s.value_tier}`;
     docs.push({
       id: `s${i}`,
       kind: "segment",
-      term: segmentName,
-      text: `${s.strategy || ""} ${s.risk_level || ""} risk`
+      term: s.name || s.segment || "",
+      text: s.description || s.notes || s.summary || ""
     });
   });
 
-  searchIndex = new MiniSearch({
-    fields: ["term", "text"],
-    storeFields: ["kind", "term", "text"],
-    searchOptions: {
-      boost: { term: 2 },
-      prefix: true,
-      fuzzy: 0.2
-    }
-  });
-
-  searchIndex.addAll(docs);
-
-  console.log(`✅ Retrieval index built: ${docs.length} documents`);
+  if (docs.length > 0) {
+    index.addAll(docs);
+  }
 }
 
-/**
- * Retrieve relevant terms for a query
- */
-export function retrieve(query: string, limit: number = 5): Array<{
-  kind: string;
-  term: string;
-  text: string;
-  score: number;
-}> {
-  if (!searchIndex) {
-    console.warn("Retrieval index not initialized");
+export function retrieve(query: string, k = 5) {
+  if (!index) {
     return [];
   }
 
   try {
-    const results = searchIndex.search(query, {
-      prefix: true,
-      fuzzy: 0.2,
-      boost: { term: 2 }
-    });
-
-    return results.slice(0, limit).map(r => ({
-      kind: (r as any).kind,
-      term: (r as any).term,
-      text: (r as any).text,
-      score: r.score
-    }));
+    const results = index.search(query, { prefix: true });
+    return results.slice(0, k);
   } catch (error) {
-    console.error("Retrieval error:", error);
+    console.warn("Retrieval error:", error);
     return [];
   }
 }
 
-/**
- * Get all glossary terms for context
- */
-export function getGlossaryTerms(): string[] {
-  if (!searchIndex) return [];
-
-  const allDocs = (searchIndex as any)._documentIds || [];
-  const glossaryTerms: string[] = [];
-
-  allDocs.forEach((id: string) => {
-    if (id.startsWith('g')) {
-      const doc = (searchIndex as any)._storedFields[id];
-      if (doc && doc.term) {
-        glossaryTerms.push(doc.term);
-      }
-    }
-  });
-
-  return glossaryTerms;
-}
-
-/**
- * Check if index is built
- */
-export function isIndexBuilt(): boolean {
-  return searchIndex !== null;
+export function isIndexBuilt() {
+  return index !== null;
 }
