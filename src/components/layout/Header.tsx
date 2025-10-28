@@ -23,7 +23,7 @@ export default function Header() {
               src="/kearney_logo.jpg"
               alt="Kearney"
               className="w-auto"
-              style={{ height: '32px' }}
+              style={{ height: '29px' }}
             />
           </div>
         </div>
