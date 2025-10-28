@@ -73,7 +73,7 @@ export default function Heatmap({
     const colorScale = d3
       .scaleSequential()
       .domain([0, d3.max(data, d => d.value)!])
-      .interpolator(d3.interpolateRgbBasis(['#E6D2FA', '#C8A5F0', '#9150E1', '#7823DC']));
+      .interpolator(d3.interpolateRgbBasis(['#E6D2FA', '#C8A5F0', '#9150E1', '#C8A5F0']));
 
     // Draw cells (rectangles for standard heatmap)
     svg
@@ -207,7 +207,7 @@ export default function Heatmap({
     gradient.append('stop').attr('offset', '0%').attr('stop-color', '#E6D2FA');
     gradient.append('stop').attr('offset', '33%').attr('stop-color', '#C8A5F0');
     gradient.append('stop').attr('offset', '67%').attr('stop-color', '#9150E1');
-    gradient.append('stop').attr('offset', '100%').attr('stop-color', '#7823DC');
+    gradient.append('stop').attr('offset', '100%').attr('stop-color', '#C8A5F0');
 
     legend
       .append('rect')

@@ -25,8 +25,8 @@ export default function ScenarioPlanner() {
   const [costPerIntervention, setCostPerIntervention] = useState(50); // $50 default
 
   // Scenario 2 (Contract Conversion) state
-  const [conversionRate, setConversionRate] = useState(0.20); // 20% default for higher impact
-  const [incentiveCost, setIncentiveCost] = useState(50); // $50 default for positive ROI
+  const [conversionRate, setConversionRate] = useState(0.15); // 15% default - realistic and profitable
+  const [incentiveCost, setIncentiveCost] = useState(35); // $35 default - sweet spot for strong ROI
 
   // Scenario 3 (Onboarding Excellence) state
   const [churnReduction, setChurnReduction] = useState(0.30); // 30% default
@@ -141,7 +141,7 @@ export default function ScenarioPlanner() {
 
     return [
       { name: 'Before', data: beforeSeries, color: '#A5A5A5' },
-      { name: 'After Onboarding Program', data: afterSeries, color: '#7823DC' },
+      { name: 'After Onboarding Program', data: afterSeries, color: '#C8A5F0' },
     ];
   }, [churnReduction]);
 
@@ -224,20 +224,11 @@ export default function ScenarioPlanner() {
 
       {/* SCENARIO 1: BUDGET OPTIMIZATION (REORDERED FROM C) */}
       <div className="card mb-8">
-        <div className="mb-6 flex justify-between items-start">
-          <div>
-            <h3 className="text-2xl font-semibold text-text-primary mb-2">Scenario 1: Budget Optimization</h3>
-            <p className="text-text-secondary">
-              Find the optimal retention budget that maximizes ROI. Adjust budget allocation to identify the sweet spot.
-            </p>
-          </div>
-          <button
-            onClick={() => { setActiveScenario('budget'); setWorkflowOpen(true); }}
-            className="px-4 py-2 rounded font-semibold text-sm whitespace-nowrap"
-            style={{ backgroundColor: 'var(--color-accent-primary)', color: '#FFFFFF' }}
-          >
-            View AI Workflow
-          </button>
+        <div className="mb-6">
+          <h3 className="text-2xl font-semibold text-text-primary mb-2">Scenario 1: Budget Optimization</h3>
+          <p className="text-text-secondary">
+            Find the optimal retention budget that maximizes ROI. Adjust budget allocation to identify the sweet spot.
+          </p>
         </div>
 
         {/* Input Controls */}
@@ -338,9 +329,9 @@ export default function ScenarioPlanner() {
         </div>
 
         {/* Optimal Budget Callout */}
-        <div className="p-6 mb-8 rounded border" style={{ backgroundColor: 'var(--color-bg-tertiary)', borderColor: 'var(--color-accent-light)' }}>
+        <div className="p-6 rounded border" style={{ backgroundColor: 'var(--color-bg-tertiary)', borderColor: 'var(--color-accent-light)' }}>
           <div className="flex items-start justify-between">
-            <div>
+            <div className="flex-1">
               <div className="text-text-tertiary text-sm mb-2">OPTIMAL BUDGET (Maximum ROI)</div>
               <div className="text-3xl font-bold text-text-primary mb-2">{formatCurrency(optimalBudget, 0)}</div>
               <div className="text-text-secondary text-sm flex items-center">
@@ -362,43 +353,23 @@ export default function ScenarioPlanner() {
                 )}
               </div>
             </div>
+            <div className="ml-6 text-right">
+              <div className="text-text-tertiary text-xs mb-1">PEAK ROI AT OPTIMAL</div>
+              <div className="text-2xl font-bold text-text-primary">
+                {roiCurveData.length > 0 ? `${(roiCurveData.reduce((prev, curr) => curr.roi > prev.roi ? curr : prev).roi * 100).toFixed(0)}%` : '--'}
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* ROI Curve Chart */}
-        <ChartContainer title="ROI by Budget Allocation" showProvenance agentRun={budgetAgentRun}>
-          <div className="flex justify-center">
-            <ROICurve
-              data={roiCurveData}
-              optimalBudget={optimalBudget}
-              width={750}
-              height={500}
-              xAxisLabel="Annual Retention Budget"
-              yAxisLabel="Return on Investment"
-            />
-          </div>
-          <div className="mt-4 text-center text-text-tertiary text-sm">
-            Peak ROI occurs at {formatCurrency(optimalBudget, 0)} annual budget
-          </div>
-        </ChartContainer>
       </div>
 
       {/* SCENARIO 2: CONTRACT CONVERSION (REORDERED FROM A) */}
       <div className="card mb-8">
-        <div className="mb-6 flex justify-between items-start">
-          <div>
-            <h3 className="text-2xl font-semibold text-text-primary mb-2">Scenario 2: Contract Conversion Program</h3>
-            <p className="text-text-secondary">
-              Convert month-to-month customers to annual contracts with targeted incentives. Focus on high-value segments.
-            </p>
-          </div>
-          <button
-            onClick={() => { setActiveScenario('contract'); setWorkflowOpen(true); }}
-            className="px-4 py-2 rounded font-semibold text-sm whitespace-nowrap"
-            style={{ backgroundColor: 'var(--color-accent-primary)', color: '#FFFFFF' }}
-          >
-            View AI Workflow
-          </button>
+        <div className="mb-6">
+          <h3 className="text-2xl font-semibold text-text-primary mb-2">Scenario 2: Contract Conversion Program</h3>
+          <p className="text-text-secondary">
+            Convert month-to-month customers to annual contracts with targeted incentives. Focus on high-value segments.
+          </p>
         </div>
 
         {/* Input Controls */}
@@ -529,7 +500,7 @@ export default function ScenarioPlanner() {
               height={450}
               yAxisLabel="Churn Rate"
               valueFormatter={(v) => v.toFixed(1) + '%'}
-              highlightColor="#7823DC"
+              highlightColor="#C8A5F0"
             />
           </div>
           <div className="mt-4 text-center text-text-tertiary text-sm">
@@ -540,20 +511,11 @@ export default function ScenarioPlanner() {
 
       {/* SCENARIO 3: ONBOARDING EXCELLENCE (REORDERED FROM B) */}
       <div className="card">
-        <div className="mb-6 flex justify-between items-start">
-          <div>
-            <h3 className="text-2xl font-semibold text-text-primary mb-2">Scenario 3: Onboarding Excellence Program</h3>
-            <p className="text-text-secondary">
-              Reduce early churn through improved onboarding and engagement. Target customers in their first 90 days.
-            </p>
-          </div>
-          <button
-            onClick={() => { setActiveScenario('onboarding'); setWorkflowOpen(true); }}
-            className="px-4 py-2 rounded font-semibold text-sm whitespace-nowrap"
-            style={{ backgroundColor: 'var(--color-accent-primary)', color: '#FFFFFF' }}
-          >
-            View AI Workflow
-          </button>
+        <div className="mb-6">
+          <h3 className="text-2xl font-semibold text-text-primary mb-2">Scenario 3: Onboarding Excellence Program</h3>
+          <p className="text-text-secondary">
+            Reduce early churn through improved onboarding and engagement. Target customers in their first 90 days.
+          </p>
         </div>
 
         {/* Input Controls */}

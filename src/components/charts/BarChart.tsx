@@ -22,7 +22,7 @@ export default function BarChart({
   height = 350,
   yAxisLabel = '',
   valueFormatter = (v) => v.toFixed(1) + '%',
-  highlightColor = '#7823DC',
+  highlightColor = '#C8A5F0',
 }: BarChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
