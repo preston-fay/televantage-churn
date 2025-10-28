@@ -20,8 +20,8 @@ export default function ExecutiveDashboard() {
     const riskColors: Record<string, string> = {
       'Low': '#D2D2D2',       // Light gray
       'Medium': '#A5A5A5',    // Medium gray
-      'High': '#C8A5F0',      // Light purple (Kearney)
-      'Very High': '#C8A5F0', // Primary purple (Kearney)
+      'High': '#7823DC',      // Light purple (Kearney)
+      'Very High': '#7823DC', // Primary purple (Kearney)
     };
 
     return data.risk_distribution.risk_levels.map((level) => ({

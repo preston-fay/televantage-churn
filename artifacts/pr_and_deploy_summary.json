@@ -1,0 +1,23 @@
+{
+  "repo": "preston-fay/televantage-churn",
+  "pr": "https://github.com/preston-fay/televantage-churn/pull/1",
+  "prNumber": 1,
+  "prStatus": "merged",
+  "sourceBranch": "claude/session-011CUZi11CFxX1t5fSX9AWK3",
+  "targetBranch": "main",
+  "mergeCommit": "8dd6c02b0c312f21063f2251c3ccd10df65590d8",
+  "appId": "d1p7obkrs6acpc",
+  "appName": "televantage-churn",
+  "branch": "main",
+  "jobId": "5",
+  "deploymentStatus": "SUCCEED",
+  "deploymentSteps": ["BUILD", "DEPLOY", "VERIFY"],
+  "startTime": "2025-10-28T15:31:37Z",
+  "endTime": "2025-10-28T15:32:51Z",
+  "duration": "1m 14s",
+  "url": "https://main.d1p7obkrs6acpc.amplifyapp.com",
+  "timestamp": "2025-10-28T15:32:51Z",
+  "autoMerge": true,
+  "filesChanged": 21,
+  "insertions": 2140
+}

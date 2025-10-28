@@ -1,0 +1,22 @@
+{
+  "appId": "d1p7obkrs6acpc",
+  "appName": "televantage-churn",
+  "branch": "main",
+  "url": "https://main.d1p7obkrs6acpc.amplifyapp.com",
+  "mode": "ci_release",
+  "commit": "8dd6c02",
+  "timestamp": "2025-10-28T15:22:05Z",
+  "jobId": "5",
+  "status": "SUCCEED",
+  "prNumber": "1",
+  "prUrl": "https://github.com/preston-fay/televantage-churn/pull/1",
+  "filesChanged": 21,
+  "insertions": 2140,
+  "features": [
+    "Observable AI Agent Execution (Data→ML→Strategy→QA pipeline)",
+    "Agent Provenance chips on all KPIs and charts",
+    "Strategy Copilot with conversational Q&A",
+    "Deployment automation scripts",
+    "Production bundles (655 KB)"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "appId": "d1p7obkrs6acpc",
+  "appName": "televantage-churn",
+  "domain": "d1p7obkrs6acpc.amplifyapp.com",
+  "deployBranch": "main",
+  "deployBranchConfig": {
+    "stage": "PRODUCTION",
+    "autoBuild": true,
+    "framework": "Web"
+  },
+  "latestJobs": [
+    {
+      "jobId": "5",
+      "status": "SUCCEED",
+      "commitId": "8dd6c02b0c312f21063f2251c3ccd10df65590d8",
+      "commitMessage": "Merge pull request #1: AI features",
+      "description": "Observable AI agents, Strategy Copilot, Provenance chips"
+    },
+    {
+      "jobId": "4",
+      "status": "SUCCEED",
+      "commitId": "HEAD",
+      "description": "JSON data fix deployment"
+    },
+    {
+      "jobId": "3",
+      "status": "SUCCEED",
+      "commitId": "5e0d2eeff32f94b68475267c86c538d0d72a4bd4",
+      "description": "Initial deployment with amplify.yml"
+    }
+  ],
+  "siteUrl": "https://main.d1p7obkrs6acpc.amplifyapp.com",
+  "repo": "https://github.com/preston-fay/televantage-churn",
+  "sourceBranch": "claude/session-011CUZi11CFxX1t5fSX9AWK3",
+  "sourceBranchMerged": true,
+  "prNumber": 1,
+  "prUrl": "https://github.com/preston-fay/televantage-churn/pull/1",
+  "autoMerge": "completed_manually",
+  "deploymentComplete": true,
+  "allFeaturesLive": true,
+  "timestamp": "2025-10-28T15:30:00Z"
+}

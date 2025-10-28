@@ -56,7 +56,7 @@ export default function ModelingDeepDive() {
     });
     return [
       { name: 'Perfect Calibration', data: perfectCalibration, color: '#A5A5A5' },
-      { name: 'Model Calibration', data: actualCalibration, color: '#C8A5F0' },
+      { name: 'Model Calibration', data: actualCalibration, color: '#7823DC' },
     ];
   }, []);
 
@@ -89,7 +89,7 @@ export default function ModelingDeepDive() {
       };
     });
 
-    return [{ name: 'Profit', data: profitPoints, color: '#C8A5F0' }];
+    return [{ name: 'Profit', data: profitPoints, color: '#7823DC' }];
   }, []);
 
   // Find optimal profit point
@@ -398,7 +398,7 @@ export default function ModelingDeepDive() {
               height={500}
               yAxisLabel="Score"
               metrics={['AUC', 'Brier', 'Avg Precision']}
-              colors={['#C8A5F0', '#9150E1', '#C8A5F0']}
+              colors={['#7823DC', '#9150E1', '#7823DC']}
             />
           </div>
         </ChartContainer>
@@ -547,7 +547,7 @@ export default function ModelingDeepDive() {
                   height={550}
                   xAxisLabel="Importance Score"
                   valueFormatter={(v) => v.toFixed(3)}
-                  color="#C8A5F0"
+                  color="#7823DC"
                 />
               </div>
             </ChartContainer>

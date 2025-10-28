@@ -79,7 +79,7 @@ export default function WaterfallChart({
     const colorMap = {
       loss: '#C8A5F0', // Kearney purple (insight color)
       gain: '#9150E1', // Bright purple
-      total: '#C8A5F0', // Medium lavender
+      total: '#7823DC', // Medium lavender
     };
 
     // Draw bars

@@ -1,13 +1,10 @@
 /**
- * AI Service for Strategy Copilot
+ * AI Service for Strategy Copilot - LIVE GPT-5 Integration
  *
- * Provides intelligent responses to questions about customer segments,
- * churn drivers, and retention strategies.
- *
- * Current implementation uses template-based responses with data lookup.
- * Can be upgraded to use Claude/GPT API by implementing the LLM fallback.
+ * Provides intelligent responses using OpenAI GPT-5 with fallback templates.
  */
 
+import OpenAI from 'openai';
 import { AppData } from '@/types/index';
 
 type KnowledgeContext = AppData;
@@ -28,6 +25,20 @@ interface CopilotResponse {
 
 export class AIService {
   private context: KnowledgeContext | null = null;
+  private openai: OpenAI | null = null;
+
+  constructor() {
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    if (apiKey && apiKey !== 'your_openai_api_key_here') {
+      this.openai = new OpenAI({
+        apiKey: apiKey,
+        dangerouslyAllowBrowser: true // For demo - use backend in production
+      });
+      console.log('✅ Strategy Copilot: GPT-5 LIVE mode enabled');
+    } else {
+      console.warn('⚠️ Strategy Copilot: Running in template mode (no API key)');
+    }
+  }
 
   setContext(context: KnowledgeContext) {
     this.context = context;
@@ -41,203 +52,166 @@ export class AIService {
       };
     }
 
-    const lowerQuestion = question.toLowerCase();
-
-    // Pattern matching for common question types
-    if (this.isAboutRisk(lowerQuestion)) {
-      return this.answerRiskQuestion(lowerQuestion);
-    }
-
-    if (this.isAboutSegment(lowerQuestion)) {
-      return this.answerSegmentQuestion(lowerQuestion);
-    }
-
-    if (this.isAboutFeatures(lowerQuestion)) {
-      return this.answerFeatureQuestion(lowerQuestion);
-    }
-
-    if (this.isAboutROI(lowerQuestion)) {
-      return this.answerROIQuestion(lowerQuestion);
-    }
-
-    if (this.isAboutStrategy(lowerQuestion)) {
-      return this.answerStrategyQuestion(lowerQuestion);
-    }
-
-    // Generic fallback
-    return this.generateGenericResponse(question);
-  }
-
-  private isAboutRisk(q: string): boolean {
-    return /\b(risk|high|medium|low|dangerous|vulnerable)\b/.test(q);
-  }
-
-  private isAboutSegment(q: string): boolean {
-    return /\b(segment|customer|cohort|group|m2m|month.to.month|contract|tenure|family|0-3)\b/.test(q);
-  }
-
-  private isAboutFeatures(q: string): boolean {
-    return /\b(feature|driver|cause|reason|why|predict|factor)\b/.test(q);
-  }
-
-  private isAboutROI(q: string): boolean {
-    return /\b(roi|return|investment|budget|cost|savings|worth|optimal)\b/.test(q);
-  }
-
-  private isAboutStrategy(q: string): boolean {
-    return /\b(strategy|approach|recommend|should|action|do|prevent|reduce)\b/.test(q);
-  }
-
-  private answerRiskQuestion(question: string): CopilotResponse {
-    const riskLevels = this.context!.risk_distribution.risk_levels;
-    const totalCustomers = this.context!.metrics.overview.total_customers;
-    const highRisk = riskLevels.find(r => r.level === 'High');
-    const veryHighRisk = riskLevels.find(r => r.level === 'Very High');
-    const mediumRisk = riskLevels.find(r => r.level === 'Medium');
-    const lowRisk = riskLevels.find(r => r.level === 'Low');
-
-    const totalHighRisk = (highRisk?.customers || 0) + (veryHighRisk?.customers || 0);
-    const highRiskPct = ((totalHighRisk / totalCustomers) * 100).toFixed(1);
-
-    // Generate donut chart data for risk distribution
-    const chartData: ChartData = {
-      type: 'donut',
-      title: 'Customer Risk Distribution',
-      data: riskLevels.map(level => ({
-        label: level.level,
-        value: level.customers,
-        percentage: level.percentage
-      })),
-      config: {
-        width: 500,
-        height: 400
+    // Try GPT-5 first if available
+    if (this.openai) {
+      try {
+        return await this.askGPT5(question);
+      } catch (error) {
+        console.error('GPT-5 error, falling back to templates:', error);
+        // Fall through to templates
       }
-    };
-
-    if (question.includes('medium')) {
-      if (!mediumRisk) {
-        return {
-          answer: "I couldn't find Medium Risk segment data. Please check the data source.",
-          citations: [],
-        };
-      }
-      return {
-        answer: `The Medium Risk segment contains ${(mediumRisk.customers / 1_000_000).toFixed(1)}M customers (${mediumRisk.percentage}% of base). These customers have 15-30% predicted churn probability. They represent a strategic opportunity: lower intervention costs than High Risk customers, but still significant retention value. Data Agent identified this segment using features like contract type, tenure, and service usage patterns.`,
-        citations: ['Executive Dashboard', 'ML Agent (AUC 0.85)', 'Risk Distribution Analysis'],
-        relatedSegments: ['Medium Risk cohort'],
-        chart: chartData
-      };
     }
 
-    return {
-      answer: `Our ML Agent (xgb_2025_09, AUC 0.85) identifies ${(totalHighRisk / 1_000_000).toFixed(1)}M customers (${highRiskPct}%) as High or Very High Risk for churn. These customers have >30% predicted churn probability and represent our primary intervention targets. The chart shows the full risk distribution across all customer segments.`,
-      citations: ['ML Agent Risk Scoring', 'Segment Explorer', 'Scenario Planner'],
-      relatedSegments: ['High Risk', 'Very High Risk', 'Month-to-Month', 'Early Tenure (0-3mo)'],
-      chart: chartData
-    };
+    // Fallback to smart templates
+    return this.askTemplates(question);
   }
 
-  private answerSegmentQuestion(question: string): CopilotResponse {
-    const segments = this.context!.segments;
+  private async askGPT5(question: string): Promise<CopilotResponse> {
+    const contextSummary = this.buildContextSummary();
 
-    // Check for specific segment mentions
-    if (question.includes('m2m') || question.includes('month-to-month') || question.includes('month to month')) {
-      const m2mSegments = segments.filter(s => s.contract_group === 'Month-to-Month');
-      const avgChurn = (m2mSegments.reduce((sum, s) => sum + s.churn_probability, 0) / m2mSegments.length * 100).toFixed(1);
+    const systemPrompt = `You are an expert data analyst for TeleVantage, analyzing customer churn.
 
-      return {
-        answer: `Month-to-month customers represent 42% of the customer base (19.9M) with an average 25% annual churn rate—5x higher than annual contract holders. Data Agent analyzed 18 M2M segments across tenure bands. The highest-risk segment is new M2M customers (0-3 months tenure) with 72% predicted churn probability. Strategy Agent recommends a two-pronged approach: (1) Contract Conversion Program: convert 20% to annual contracts with $50 incentives → $223M annual savings, (2) Precision Retention: target high-value M2M customers with personalized offers → 160% ROI. See Scenarios → Contract Conversion for interactive modeling.`,
-        citations: ['Segment Explorer', 'Strategy Agent Analysis', 'Scenario Planner'],
-        relatedSegments: ['Month-to-Month (All Tenure Bands)', 'M2M 0-3mo (Highest Risk)'],
-      };
-    }
+DATA AVAILABLE:
+${contextSummary}
 
-    if (question.includes('0-3') || question.includes('early') || question.includes('new')) {
-      return {
-        answer: `Early-tenure customers (0-3 months) represent 25% of the base (11.8M) but experience 40% annual churn—the highest rate across all tenure bands. Data Agent root cause analysis shows three primary drivers: (1) Setup friction: complex activation creates negative first impressions, (2) Value uncertainty: customers don't yet understand features they're paying for, (3) Unresolved issues: early technical problems erode trust. Strategy Agent recommends an Enhanced Onboarding Program: reduce early churn by 30% through personalized setup guides, proactive engagement at Days 7/30/60, and usage reports. Expected outcome: retain 227K customers annually, $98M retention value, 3-year NPV of $194M. See Scenarios → Onboarding Excellence for detailed ROI projections.`,
-        citations: ['Segment Explorer', 'Onboarding Analysis', 'Scenario Planner'],
-        relatedSegments: ['Early Tenure (0-3 months)', 'All Contract Types'],
-      };
-    }
+RESPONSE FORMAT (JSON):
+{
+  "answer": "2-3 sentence answer with specific numbers",
+  "citations": ["Data source 1", "Data source 2"],
+  "relatedSegments": ["Segment 1", "Segment 2"] (optional),
+  "chart": {
+    "type": "donut|bar|horizontal-bar",
+    "title": "Chart title",
+    "data": [...],
+    "config": {"width": 500, "height": 400}
+  } (optional - only if genuinely helpful)
+}
 
-    // Generic segment response
-    return {
-      answer: `The Data Agent has segmented our 47.3M customers into 54 distinct cohorts based on contract type (M2M, 1-Year, 2-Year) and tenure bands (0-3mo, 4-6mo, 7-12mo, 13-24mo, 25+mo). Churn probability varies dramatically—from 72% (new M2M customers) to 12% (long-tenure 2-year contracts). Each segment has a tailored retention strategy with projected ROI ranging from 80% to 200%. The Segment Explorer (tab 5) provides an interactive heatmap where you can drill into any cohort to see representative customer personas, intervention strategies, and expected returns. Which specific segment would you like to explore?`,
-      citations: ['Segment Explorer', 'Data Agent Segmentation', '54-Cohort Analysis'],
-      relatedSegments: ['All 54 segments available in Segment Explorer'],
-    };
-  }
+CHART FORMATS:
+- donut: [{"label": "High Risk", "value": 5000000, "percentage": 25}]
+- bar: [{"category": "Budget\\nOpt", "value": 160, "label": "$571M"}]
+- horizontal-bar: [{"name": "Contract Type", "value": 14.2}]
 
-  private answerFeatureQuestion(question: string): CopilotResponse {
-    const features = this.context!.feature_importance.features;
-    const topFeature = features[0];
+RULES:
+- Use REAL numbers from the data
+- Keep answers brief (2-3 sentences)
+- Only add chart if it adds real value
+- Use actual segment/feature names from data
+- Cite specific sources (ML Agent, Segment Explorer, etc.)
+- For risk questions, use risk_distribution data
+- For features, use feature_importance data
+- For ROI, reference: Budget(160%), Contract(112%), Onboarding(96%)`;
 
-    // Generate horizontal bar chart for top 10 features
-    const chartData: ChartData = {
-      type: 'horizontal-bar',
-      title: 'Top 10 Churn Drivers',
-      data: features.slice(0, 10).map(f => ({
-        name: f.name,
-        value: f.importance * 100,
-        interpretation: f.interpretation
-      })),
-      config: {
-        width: 600,
-        height: 450,
-        valueFormatter: (v: number) => `${v.toFixed(1)}%`
-      }
-    };
-
-    return {
-      answer: `The ML Agent (xgb_2025_09) identified the top churn driver as "${topFeature.name}" with ${(topFeature.importance * 100).toFixed(1)}% predictive weight. Interpretation: ${topFeature.interpretation}. The chart shows the complete top 10 feature ranking. QA Agent validated that all features are business-actionable and compliant with data governance policies.`,
-      citations: ['ML Agent Feature Importance', 'Analytics Deep-Dive', 'QA Agent Validation'],
-      chart: chartData
-    };
-  }
-
-  private answerROIQuestion(question: string): CopilotResponse {
-    if (question.includes('optimal') || question.includes('best') || question.includes('220')) {
-      return {
-        answer: `Strategy Agent identified $220M as the optimal annual retention budget through marginal ROI analysis. At this allocation point: (1) Cost per intervention: $50 average, (2) Customers targeted: 4.4M highest-risk/highest-value, (3) Expected saves: 1.32M customers (30% save rate), (4) Annual retention value: $571M, (5) ROI: 160%. Beyond $220M, marginal returns decline as we exhaust high-probability saves and target lower-value customers.`,
-        citations: ['Strategy Agent Optimization', 'Scenario Planner', 'QA Agent Validation'],
-      };
-    }
-
-    // Generate bar chart comparing the 3 scenarios
-    const chartData: ChartData = {
-      type: 'bar',
-      title: 'ROI Comparison Across Retention Strategies',
-      data: [
-        { category: 'Budget\nOptimization', value: 160, label: '$571M savings' },
-        { category: 'Contract\nConversion', value: 112, label: '$223M savings' },
-        { category: 'Onboarding\nExcellence', value: 96, label: '$98M savings' }
+    const response = await this.openai!.chat.completions.create({
+      model: "gpt-5",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: question }
       ],
-      config: {
-        width: 550,
-        height: 400,
-        valueFormatter: (v: number) => `${v}%`,
-        yAxisLabel: 'ROI (%)'
-      }
-    };
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+      max_tokens: 1500
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || '{}');
 
     return {
-      answer: `Strategy Agent projects three retention initiatives with distinct ROI profiles: (1) Budget Optimization: $220M investment → $571M savings → 160% ROI, (2) Contract Conversion: $199M investment → $223M savings → 112% ROI, (3) Onboarding Excellence: $50M investment → $98M savings → 96% ROI. Combined portfolio delivers $892M annual retention value against $469M investment (90% blended ROI). The chart compares ROI across all three strategies.`,
-      citations: ['Strategy Agent Portfolio Analysis', 'Executive Dashboard', 'QA Agent Validation'],
-      chart: chartData
-    };
-  }
-
-  private answerStrategyQuestion(question: string): CopilotResponse {
-    return {
-      answer: `Strategy Agent recommends a three-phase retention roadmap prioritized by time-to-value and ROI: Phase 1 (Months 1-3): Deploy AI-driven customer scoring and precision budget allocation targeting 4.4M high-risk customers ($220M investment, 160% ROI). Quick win with low implementation complexity. Phase 2 (Months 4-9): Launch contract conversion program converting 20% of M2M customers to annual commitments with targeted incentives ($199M investment, 100% ROI). Medium complexity requiring offer design and testing. Phase 3 (Months 10-21): Implement enhanced onboarding program reducing early churn by 30% through personalized engagement ($50M investment, 96% ROI). Higher complexity requiring process redesign. Combined: $892M annual retention value, 90% portfolio ROI. QA Agent validated feasibility against organizational capacity and change management constraints. See Scenarios tab for interactive what-if modeling.`,
-      citations: ['Strategy Agent Roadmap', 'Executive Dashboard Recommendations', 'QA Agent Feasibility'],
+      answer: result.answer || "I couldn't generate a response.",
+      citations: result.citations || ['AI Analysis'],
+      relatedSegments: result.relatedSegments,
+      chart: result.chart
     };
   }
 
-  private generateGenericResponse(question: string): CopilotResponse {
+  private buildContextSummary(): string {
+    if (!this.context) return '';
+
+    const riskLevels = this.context.risk_distribution.risk_levels;
+    const topFeatures = this.context.feature_importance.features.slice(0, 5);
+    const totalCustomers = this.context.metrics.overview.total_customers;
+
+    return `CUSTOMERS: ${(totalCustomers / 1_000_000).toFixed(1)}M total
+
+RISK:
+${riskLevels.map(r => `${r.level}: ${(r.customers / 1_000_000).toFixed(1)}M (${r.percentage}%)`).join(', ')}
+
+TOP CHURN DRIVERS:
+${topFeatures.map((f, i) => `${i + 1}. ${f.name} (${(f.importance * 100).toFixed(1)}%): ${f.interpretation}`).join('\n')}
+
+SEGMENTS: ${this.context.segments.length} cohorts
+- M2M: 19.9M (42%, 25% churn)
+- 1-Year: 16.6M (35%, 12% churn)
+- 2-Year: 10.9M (23%, 5% churn)
+- Early tenure (0-3mo): 11.8M (40% churn - HIGHEST)
+
+ROI STRATEGIES:
+1. Budget Optimization: $220M → $571M (160% ROI)
+2. Contract Conversion: $199M → $223M (112% ROI)
+3. Onboarding: $50M → $98M (96% ROI)`;
+  }
+
+  // Smart template fallback
+  private askTemplates(question: string): CopilotResponse {
+    const lowerQ = question.toLowerCase();
+
+    // Risk questions
+    if (/risk|distribution|high|medium|low/i.test(lowerQ)) {
+      const riskLevels = this.context!.risk_distribution.risk_levels;
+      const high = riskLevels.find(r => r.level === 'High');
+      const veryHigh = riskLevels.find(r => r.level === 'Very High');
+      const totalHigh = ((high?.customers || 0) + (veryHigh?.customers || 0)) / 1_000_000;
+
+      return {
+        answer: `Our ML Agent identifies ${totalHigh.toFixed(1)}M customers as High/Very High Risk (>30% churn probability). These are our primary intervention targets. The chart shows the full risk distribution across all segments.`,
+        citations: ['ML Agent (AUC 0.85)', 'Risk Distribution'],
+        chart: {
+          type: 'donut',
+          title: 'Customer Risk Distribution',
+          data: riskLevels.map(r => ({ label: r.level, value: r.customers, percentage: r.percentage })),
+          config: { width: 500, height: 400 }
+        }
+      };
+    }
+
+    // Feature/driver questions
+    if (/feature|driver|cause|factor|why|predict/i.test(lowerQ)) {
+      const features = this.context!.feature_importance.features;
+      const top = features[0];
+
+      return {
+        answer: `The top churn driver is "${top.name}" with ${(top.importance * 100).toFixed(1)}% predictive weight. ${top.interpretation} The chart shows the top 10 drivers ranked by ML importance.`,
+        citations: ['ML Agent', 'Feature Importance Analysis'],
+        chart: {
+          type: 'horizontal-bar',
+          title: 'Top 10 Churn Drivers',
+          data: features.slice(0, 10).map(f => ({ name: f.name, value: f.importance * 100 })),
+          config: { width: 600, height: 450, valueFormatter: (v: number) => `${v.toFixed(1)}%` }
+        }
+      };
+    }
+
+    // ROI comparison
+    if (/roi|return|compare|strateg/i.test(lowerQ)) {
+      return {
+        answer: `Three retention strategies with distinct ROI profiles: Budget Optimization (160% ROI, $571M savings), Contract Conversion (112% ROI, $223M savings), and Onboarding Excellence (96% ROI, $98M savings). Combined portfolio delivers 90% blended ROI.`,
+        citations: ['Strategy Agent', 'ROI Analysis'],
+        chart: {
+          type: 'bar',
+          title: 'ROI Comparison Across Strategies',
+          data: [
+            { category: 'Budget\nOptimization', value: 160, label: '$571M' },
+            { category: 'Contract\nConversion', value: 112, label: '$223M' },
+            { category: 'Onboarding\nExcellence', value: 96, label: '$98M' }
+          ],
+          config: { width: 550, height: 400, valueFormatter: (v: number) => `${v}%`, yAxisLabel: 'ROI (%)' }
+        }
+      };
+    }
+
+    // Generic
     return {
-      answer: `I can help you understand customer segments, churn drivers, retention strategies, and ROI projections. Try asking about: "Why is the Medium Risk segment so large?", "What should we do about month-to-month customers?", "What's the optimal retention budget?", or "What are the top churn drivers?". You can also specify a segment like "Tell me about early-tenure customers" or ask for strategy recommendations. All insights are generated by our Data, ML, Strategy, and QA agents working together.`,
-      citations: ['Strategy Copilot Help'],
+      answer: `I can analyze customer segments, churn drivers, and retention strategies. Try: "Show me risk distribution", "What are the top churn drivers?", or "Compare ROI across strategies".`,
+      citations: ['Strategy Copilot'],
     };
   }
 }

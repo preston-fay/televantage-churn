@@ -103,8 +103,8 @@ export default function SegmentExplorer() {
 
   const riskColorMap: Record<string, string> = {
     'Low': '#D2D2D2',        // Gray for low risk
-    'Medium': '#C8A5F0',     // Light purple for medium
-    'High': '#C8A5F0',       // Primary purple for high
+    'Medium': '#7823DC',     // Light purple for medium
+    'High': '#7823DC',       // Primary purple for high
     'Very High': '#5A1BA3',  // Darker purple for very high
   };
 
