@@ -1,0 +1,38 @@
+Uses Amplify-injected Vite env, shows production LLM badge, and adds /#/llm-check diagnostics to prove live LLM calls with labeled charts and citations.
+
+## What This PR Does
+
+1. **Centralized Environment Configuration**
+   - Uses import.meta.env for Amplify build-time injection
+   - Exports ENV.KEY, ENV.MODEL, ENV.BASE, ENV.PROD
+   - Fixed model default to gpt-4o
+
+2. **Production LLM Health Badge**
+   - Only visible in production builds (ENV.PROD)
+   - Shows LLM ON (gpt-4o) or LLM OFF — deterministic mode
+   - Fixed bottom-right, no secrets displayed
+
+3. **Live Diagnostics Route (/llm-check)**
+   - 4 real LLM query tests that verify:
+     - RAG definition retrieval (What is ARPU?)
+     - Compute + labeled bar charts (ARPU impact)
+     - Donut charts with string labels (risk distribution)
+     - ROI comparison bar chart with xLabel
+   - Shows pass/fail status and chart titles
+   - Auto-runs on mount, re-runnable
+
+## Verification After Deploy
+
+Visit: https://main.d1p7obkrs6acpc.amplifyapp.com/#/llm-check
+
+All 4 checks should show ✅ PASS with:
+- Chart titles visible in Details
+- No secrets displayed
+- Bottom-right badge shows LLM ON (gpt-4o)
+
+## Testing
+
+- ✅ Build passes locally (npm run build)
+- ✅ All TypeScript checks pass
+- ✅ Routes properly wired in App.tsx
+- ✅ Badge only renders in production mode

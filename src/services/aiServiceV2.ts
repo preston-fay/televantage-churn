@@ -165,6 +165,12 @@ function convertChartToLegacy(chart: any) {
   }
 
   // Bar/horizontal-bar - HorizontalBarChart expects: { label, value }
+  // Detect currency charts and provide formatter
+  const isCurrency = chart.yLabel && /\$|dollar|arpu|revenue|price|cost/i.test(chart.yLabel);
+  const valueFormatter = isCurrency
+    ? (v: number) => `$${v.toFixed(2)}`
+    : undefined; // Use default % formatter
+
   return {
     type: "bar",
     title: chart.title,
@@ -178,7 +184,8 @@ function convertChartToLegacy(chart: any) {
       width: 600,
       height: 450,
       yAxisLabel: chart.yLabel,
-      xAxisLabel: chart.xLabel
+      xAxisLabel: chart.xLabel,
+      valueFormatter
     }
   };
 }
