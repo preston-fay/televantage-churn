@@ -7,6 +7,8 @@ import ChartContainer from '@/components/shared/ChartContainer';
 import BarChart from '@/components/charts/BarChart';
 import LineChart from '@/components/charts/LineChart';
 import ROICurve from '@/components/charts/ROICurve';
+import AgentTraceDisplay from '@/components/agent/AgentTraceDisplay';
+import { useAgentRun } from '@/hooks/useAgentRun';
 import { calculateContractConversion, calculateOnboardingExcellence, calculateBudgetOptimization, generateROICurve } from '@/utils/scenarioCalculators';
 import { formatCurrency, formatPercent } from '@/utils/formatters';
 import { BarChart3, Bot, Lightbulb, CheckCircle, X, Sparkles, DollarSign, Check, TrendingUp, TrendingDown } from 'lucide-react';
@@ -143,6 +145,40 @@ export default function ScenarioPlanner() {
     ];
   }, [churnReduction]);
 
+  // Agent runs for each scenario
+  const budgetAgentRun = useAgentRun(
+    resultsC
+      ? {
+          type: 'budget',
+          retentionBudget,
+          costPerIntervention,
+          output: resultsC,
+        }
+      : null
+  );
+
+  const contractAgentRun = useAgentRun(
+    results
+      ? {
+          type: 'contract',
+          conversionRate,
+          incentiveCost,
+          output: results,
+        }
+      : null
+  );
+
+  const onboardingAgentRun = useAgentRun(
+    resultsB
+      ? {
+          type: 'onboarding',
+          churnReduction,
+          programInvestment,
+          output: resultsB,
+        }
+      : null
+  );
+
   if (isLoading) {
     return <LoadingSpinner message="Loading scenario data..." />;
   }
@@ -225,6 +261,9 @@ export default function ScenarioPlanner() {
             formatter={(v) => '$' + v.toFixed(0)}
           />
         </div>
+
+        {/* Agent Trace */}
+        <AgentTraceDisplay agentRun={budgetAgentRun} />
 
         {/* SIDE-BY-SIDE BEFORE/AFTER LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -327,7 +366,7 @@ export default function ScenarioPlanner() {
         </div>
 
         {/* ROI Curve Chart */}
-        <ChartContainer title="ROI by Budget Allocation">
+        <ChartContainer title="ROI by Budget Allocation" showProvenance agentRun={budgetAgentRun}>
           <div className="flex justify-center">
             <ROICurve
               data={roiCurveData}
@@ -383,6 +422,9 @@ export default function ScenarioPlanner() {
             step={10}
           />
         </div>
+
+        {/* Agent Trace */}
+        <AgentTraceDisplay agentRun={contractAgentRun} />
 
         {/* SIDE-BY-SIDE BEFORE/AFTER LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -535,6 +577,9 @@ export default function ScenarioPlanner() {
             step={5_000_000}
           />
         </div>
+
+        {/* Agent Trace */}
+        <AgentTraceDisplay agentRun={onboardingAgentRun} />
 
         {/* SIDE-BY-SIDE BEFORE/AFTER LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
