@@ -1,10 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, X, Sparkles } from 'lucide-react';
 import { aiService } from '@/services/aiServiceV2';
-import type { ChartData } from '@/services/aiService';
 import BarChart from '@/components/charts/BarChart';
 import DonutChart from '@/components/charts/DonutChart';
 import HorizontalBarChart from '@/components/charts/HorizontalBarChart';
+
+// Chart data type
+interface ChartData {
+  type: 'bar' | 'donut' | 'horizontal-bar';
+  title: string;
+  data: any[];
+  config?: any;
+}
 
 interface Message {
   role: 'user' | 'assistant';
