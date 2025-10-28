@@ -3,7 +3,7 @@
  * Clean architecture: LLM + Tool-calling + RAG + Strict validation
  */
 
-import { hasLLM } from "../config/env";
+import { HAS_LLM } from "../config/env";
 import { llmWithTools } from "../ai/runtime";
 import { Tools, setToolsData } from "../ai/tools";
 import { ragSearch, buildRAG } from "../ai/rag";
@@ -25,7 +25,7 @@ export async function askCopilot({ text }: { text: string }): Promise<Answer> {
   console.log("🎯 askCopilot called with:", text);
 
   try {
-    if (hasLLM) {
+    if (HAS_LLM) {
       console.log("✅ LLM available, calling OpenAI with function calling");
       const res = await llmWithTools(text);
 

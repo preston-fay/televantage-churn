@@ -1,14 +1,14 @@
-import { ENV, hasLLM } from "../config/env";
+import { ENV, HAS_LLM } from "../config/env";
 import { toolSpecs, Tools, ToolName } from "./tools";
 
 export async function llmWithTools(question:string){
-  if (!hasLLM) throw new Error("LLMUnavailable: No API key configured");
+  if (!HAS_LLM) throw new Error("LLMUnavailable: No API key configured");
 
-  const res = await fetch(`${ENV.OPENAI_BASE_URL}/v1/chat/completions`,{
+  const res = await fetch(`${ENV.BASE}/v1/chat/completions`,{
     method:"POST",
-    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${ENV.OPENAI_KEY}` },
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${ENV.KEY}` },
     body: JSON.stringify({
-      model: ENV.OPENAI_MODEL,
+      model: ENV.MODEL,
       temperature: 0.2,
       tools: toolSpecs.map(s => ({
         type:"function",

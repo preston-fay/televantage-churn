@@ -7,6 +7,8 @@ import ScenarioPlanner from './tabs/ScenarioPlanner';
 import AIPoweredIntelligence from './tabs/AIPoweredIntelligence';
 import ModelingDeepDive from './tabs/ModelingDeepDive';
 import SegmentExplorer from './tabs/SegmentExplorer';
+import ProdLLMBadge from './components/ProdLLMBadge';
+import { ProdDiagnostics } from './routes';
 
 function App() {
   return (
@@ -21,8 +23,10 @@ function App() {
               <Route path="/workflow" element={<AIPoweredIntelligence />} />
               <Route path="/analytics" element={<ModelingDeepDive />} />
               <Route path="/segments" element={<SegmentExplorer />} />
+              <Route path="/llm-check" element={<ProdDiagnostics />} />
             </Routes>
           </main>
+          <ProdLLMBadge />
         </div>
       </Router>
     </AppProvider>
