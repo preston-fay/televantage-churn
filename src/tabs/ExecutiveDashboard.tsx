@@ -107,7 +107,6 @@ export default function ExecutiveDashboard() {
           label="Total Customers"
           value={metrics.overview.total_customers}
           formatter={(v) => formatLargeNumber(v)}
-          showProvenance
         />
         <div className="card">
           <div className="flex items-center space-x-2 mb-2">
@@ -143,7 +142,6 @@ export default function ExecutiveDashboard() {
           label="Addressable Retention Opportunity"
           value={metrics.overview.ai_opportunity}
           formatter={(v) => formatCompactCurrency(v)}
-          showProvenance
         />
         <div className="card">
           <div className="flex items-center space-x-2 mb-2">
@@ -162,7 +160,7 @@ export default function ExecutiveDashboard() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <ChartContainer title="Customer Risk Distribution" showProvenance>
+        <ChartContainer title="Customer Risk Distribution">
           <div className="flex justify-center">
             <DonutChart
               data={riskData}
@@ -177,7 +175,7 @@ export default function ExecutiveDashboard() {
           </p>
         </ChartContainer>
 
-        <ChartContainer title="Retention Economics Opportunity" showProvenance>
+        <ChartContainer title="Retention Economics Opportunity">
           <WaterfallChart data={waterfallData} width={650} height={500} />
           <p className="text-text-secondary text-sm text-center mt-4">
             Targeted interventions can reduce annual turnover impact by $2.2B through strategic retention programs
