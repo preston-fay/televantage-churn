@@ -12,6 +12,8 @@ import { useAgentRun } from '@/hooks/useAgentRun';
 import { calculateContractConversion, calculateOnboardingExcellence, calculateBudgetOptimization, generateROICurve } from '@/utils/scenarioCalculators';
 import { formatCurrency, formatPercent } from '@/utils/formatters';
 import { BarChart3, Bot, Lightbulb, CheckCircle, X, Sparkles, DollarSign, Check, TrendingUp, TrendingDown } from 'lucide-react';
+import { getStrategyFinancials, projectArpuDelta, calculateIRR } from '@/services/financialData';
+import numeral from 'numeral';
 
 export default function ScenarioPlanner() {
   const { assumptions, isLoading, error } = useAppContext();
@@ -43,6 +45,14 @@ export default function ScenarioPlanner() {
     );
   }, [retentionBudget, costPerIntervention, assumptions]);
 
+  // Financial metrics for Scenario 1 (Budget Optimization)
+  const financialsC = useMemo(() => {
+    const irr = calculateIRR(retentionBudget, resultsC.annual_savings, 3);
+    const churnDelta = resultsC.customers_saved / 47_300_000; // as fraction
+    const arpuDelta = projectArpuDelta(churnDelta, null, assumptions);
+    return { irr, arpuDelta };
+  }, [resultsC, retentionBudget, assumptions]);
+
   // Generate ROI curve for Scenario 1
   const roiCurveData = useMemo(() => {
     return generateROICurve(costPerIntervention, assumptions, 25);
@@ -67,6 +77,14 @@ export default function ScenarioPlanner() {
       assumptions
     );
   }, [conversionRate, incentiveCost, assumptions]);
+
+  // Financial metrics for Scenario 2 (Contract Conversion)
+  const financials = useMemo(() => {
+    const irr = calculateIRR(results.total_cost, results.annual_savings, 3);
+    const churnDelta = results.churn_reduction;
+    const arpuDelta = projectArpuDelta(churnDelta, null, assumptions);
+    return { irr, arpuDelta };
+  }, [results, assumptions]);
 
   // Prepare chart data for Scenario 2
   const chartData = useMemo(() => {
@@ -116,6 +134,14 @@ export default function ScenarioPlanner() {
       assumptions
     );
   }, [churnReduction, programInvestment, assumptions]);
+
+  // Financial metrics for Scenario 3 (Onboarding Excellence)
+  const financialsB = useMemo(() => {
+    const irr = calculateIRR(programInvestment, resultsB.annual_savings, 3);
+    const churnDelta = resultsB.customers_saved / 47_300_000; // as fraction
+    const arpuDelta = projectArpuDelta(churnDelta, null, assumptions);
+    return { irr, arpuDelta };
+  }, [resultsB, programInvestment, assumptions]);
 
   // Prepare line chart data for Scenario 3
   const tenureChartData = useMemo(() => {
@@ -318,12 +344,18 @@ export default function ScenarioPlanner() {
               <div className="text-5xl font-bold text-text-primary">{formatCurrency(resultsC.annual_savings, 0)}</div>
             </div>
 
-            <div className="p-4 rounded" style={{ backgroundColor: 'var(--color-accent-primary)' }}>
-              <div className="text-white text-sm mb-1 opacity-90 flex items-center">
-                <Sparkles size={16} className="mr-1" />
-                ROI
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="p-4 rounded" style={{ backgroundColor: 'var(--color-accent-primary)' }}>
+                <div className="text-white text-sm mb-1 opacity-90 flex items-center">
+                  <Sparkles size={16} className="mr-1" />
+                  ROI / IRR
+                </div>
+                <div className="text-3xl font-bold text-white">{resultsC.roi > 0 ? '+' : ''}{(resultsC.roi * 100).toFixed(0)}% · {(financialsC.irr * 100).toFixed(1)}%</div>
               </div>
-              <div className="text-4xl font-bold text-white">{resultsC.roi > 0 ? '+' : ''}{(resultsC.roi * 100).toFixed(0)}%</div>
+              <div className="p-4 rounded border border-border-primary" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                <div className="text-text-tertiary text-sm mb-1">ARPU Change</div>
+                <div className="text-3xl font-bold text-text-primary">+{numeral(financialsC.arpuDelta).format('$0,0.00')}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -459,12 +491,18 @@ export default function ScenarioPlanner() {
               <div className="text-5xl font-bold text-text-primary">{formatCurrency(results.annual_savings, 0)}</div>
             </div>
 
-            <div className="p-4 rounded" style={{ backgroundColor: 'var(--color-accent-primary)' }}>
-              <div className="text-white text-sm mb-1 opacity-90 flex items-center">
-                <Sparkles size={16} className="mr-1" />
-                ROI
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="p-4 rounded" style={{ backgroundColor: 'var(--color-accent-primary)' }}>
+                <div className="text-white text-sm mb-1 opacity-90 flex items-center">
+                  <Sparkles size={16} className="mr-1" />
+                  ROI / IRR
+                </div>
+                <div className="text-3xl font-bold text-white">{results.roi > 0 ? '+' : ''}{(results.roi * 100).toFixed(0)}% · {(financials.irr * 100).toFixed(1)}%</div>
               </div>
-              <div className="text-4xl font-bold text-white">{results.roi > 0 ? '+' : ''}{(results.roi * 100).toFixed(0)}%</div>
+              <div className="p-4 rounded border border-border-primary" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                <div className="text-text-tertiary text-sm mb-1">ARPU Change</div>
+                <div className="text-3xl font-bold text-text-primary">+{numeral(financials.arpuDelta).format('$0,0.00')}</div>
+              </div>
             </div>
           </div>
         </div>

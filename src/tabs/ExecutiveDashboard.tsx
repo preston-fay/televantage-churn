@@ -7,10 +7,17 @@ import DonutChart from '@/components/charts/DonutChart';
 import WaterfallChart from '@/components/charts/WaterfallChart';
 import { formatCompactCurrency, formatLargeNumber, formatPercent } from '@/utils/formatters';
 import { ChevronDown, ChevronUp, Info } from 'lucide-react';
+import { getFinancialMetrics, formatFinancial } from '@/services/financialData';
+import numeral from 'numeral';
 
 export default function ExecutiveDashboard() {
-  const { data, isLoading, error } = useAppContext();
+  const { data, isLoading, error, assumptions } = useAppContext();
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
+
+  // Get financial metrics
+  const financialMetrics = useMemo(() => {
+    return getFinancialMetrics(data, assumptions);
+  }, [data, assumptions]);
 
   // Prepare donut chart data
   const riskData = useMemo(() => {
@@ -101,19 +108,43 @@ export default function ExecutiveDashboard() {
       </div>
 
       {/* Hero KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <KPICard
           label="Total Customers"
           value={metrics.overview.total_customers}
           formatter={(v) => formatLargeNumber(v)}
           showProvenance
         />
-        <KPICard
-          label="Annual Customer Turnover Impact"
-          value={metrics.overview.annual_churn_cost}
-          formatter={(v) => formatCompactCurrency(v)}
-          showProvenance
-        />
+        <div className="card">
+          <div className="flex items-center space-x-2 mb-2">
+            <div className="text-text-tertiary text-sm font-medium">Average Revenue Per User (ARPU)</div>
+            <div className="group relative">
+              <Info size={16} className="text-text-tertiary cursor-help" />
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-bg-primary border border-border-primary rounded shadow-lg text-text-secondary text-xs w-64 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10">
+                ARPU = Total Service Revenue ÷ Active Subscribers. Key indicator of pricing power and customer value.
+              </div>
+            </div>
+          </div>
+          <div className="text-text-primary text-3xl font-bold mb-2" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            ${numeral(financialMetrics.arpu).format('0,0.00')}
+          </div>
+          <div className="text-text-secondary text-sm">Per month</div>
+        </div>
+        <div className="card">
+          <div className="flex items-center space-x-2 mb-2">
+            <div className="text-text-tertiary text-sm font-medium">EBITDA Impact</div>
+            <div className="group relative">
+              <Info size={16} className="text-text-tertiary cursor-help" />
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-bg-primary border border-border-primary rounded shadow-lg text-text-secondary text-xs w-64 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10">
+                Earnings before interest, taxes, depreciation & amortization. Core operating profitability measure from retention strategies.
+              </div>
+            </div>
+          </div>
+          <div className="text-text-primary text-3xl font-bold mb-2" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {numeral(financialMetrics.ebitdaImpact).format('$0.0a').toUpperCase()}
+          </div>
+          <div className="text-text-secondary text-sm">Annual opportunity</div>
+        </div>
         <KPICard
           label="Addressable Retention Opportunity"
           value={metrics.overview.ai_opportunity}

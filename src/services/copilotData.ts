@@ -142,7 +142,7 @@ export function getModelMetrics(data: AppData): string {
 
   return `ML MODEL PERFORMANCE:
 - Model: ${model.model_name}
-- AUC: ${model.auc.toFixed(3)} (Excellent discrimination)
+- AUC: ${model.model_auc.toFixed(3)} (Excellent discrimination)
 - Total Customers Analyzed: ${(model.total_customers / 1_000_000).toFixed(1)}M
 - Annual Churn Cost: $${(model.annual_churn_cost / 1_000_000).toFixed(0)}M
 - AI-Identified Opportunity: $${(model.ai_opportunity / 1_000_000).toFixed(0)}M`;

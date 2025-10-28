@@ -1,5 +1,7 @@
 // Data types matching the generated JSON files
 
+import { FinancialMetrics } from './FinancialMetrics';
+
 export interface Model {
   name: string;
   abbrev: string;
@@ -175,6 +177,7 @@ export interface AppData {
   customers_summary: CustomersSummary;
   risk_distribution: RiskDistribution;
   feature_importance: FeatureImportance;
+  financials?: FinancialMetrics;
 }
 
 // Application state

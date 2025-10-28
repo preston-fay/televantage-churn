@@ -19,6 +19,8 @@ import {
   findRelatedSegments,
   getSegmentSummary
 } from './copilotData';
+import { getFinancialMetrics, formatFinancial } from './financialData';
+import { detectIntent } from './copilotIntents';
 
 type KnowledgeContext = AppData;
 
@@ -84,11 +86,25 @@ export class AIService {
 
   private async askGPT5(question: string): Promise<CopilotResponse> {
     const contextData = buildFullContext(this.context!);
+    const financialMetrics = getFinancialMetrics(this.context!);
+    const intent = detectIntent(question);
+
+    const financialContext = `
+FINANCIAL METRICS:
+- ARPU (Average Revenue Per User): $${financialMetrics.arpu.toFixed(2)}/month
+- IRR (Internal Rate of Return): ${(financialMetrics.irr * 100).toFixed(1)}% annualized
+- CLTV (Customer Lifetime Value): $${financialMetrics.cltv.toFixed(0)}
+- EBITDA Impact: ${formatFinancial(financialMetrics.ebitdaImpact, 'currency')} annually
+- SAC (Subscriber Acquisition Cost): $${financialMetrics.sac || 'N/A'}
+- MRR (Monthly Recurring Revenue): ${financialMetrics.mrr ? formatFinancial(financialMetrics.mrr, 'currency') : 'N/A'}
+- NPS (Net Promoter Score): ${financialMetrics.nps || 'N/A'}`;
 
     const systemPrompt = `You are an expert data analyst for TeleVantage, analyzing customer churn data.
 
 AVAILABLE DATA:
 ${contextData}
+
+${financialContext}
 
 YOUR TASK:
 Answer the user's question with REAL data from above. ALWAYS follow this response structure:
@@ -117,8 +133,9 @@ Answer the user's question with REAL data from above. ALWAYS follow this respons
 
 RULES:
 1. TEXT: Always 20+ characters, use EXACT numbers from the data provided
-2. CITATIONS: Minimum 1, reference specific tabs/charts (e.g., "Risk Distribution Chart" from "SegmentExplorer")
-3. CHART: Optional - only include if it genuinely adds value and helps answer the question
+2. RECOGNIZE TELCO TERMS: When asked about ARPU, IRR, CLTV, EBITDA, SAC, MRR, or NPS, answer with real values from FINANCIAL METRICS section
+3. CITATIONS: Minimum 1, reference specific tabs/charts (e.g., "Risk Distribution Chart" from "SegmentExplorer")
+4. CHART: Optional - only include if it genuinely adds value and helps answer the question
    - Always include descriptive title
    - Include xLabel and yLabel when appropriate
    - Use exact data values from context
