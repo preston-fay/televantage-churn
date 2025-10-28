@@ -14,12 +14,9 @@ export const Tools = {
   get_risk_distribution(): ToolResult {
     const rows = AppData?.risk_distribution?.risk_levels || [];
     return {
-      table: rows,
-      chart: {
-        kind: "donut", title: "Customer Risk Distribution",
-        series: [{ name:"Risk Segments", data: rows.map((r:any)=>({ x:r.level, y:r.customers })) }]
-      },
-      citations: [{ source:"ExecutiveDashboard", ref:"Risk distribution donut" }]
+      table: rows.map((r:any)=>({ segment: r.level, customers: r.customers })),
+      text: "Risk distribution by customer segment.",
+      citations: [{ source:"ExecutiveDashboard", ref:"Risk distribution" }]
     };
   },
 
@@ -27,12 +24,11 @@ export const Tools = {
     const all = AppData?.feature_importance?.features || [];
     const rows = all.slice(0, topN);
     return {
-      table: rows,
-      chart: {
-        kind: "bar", title: `Top ${topN} Churn Drivers (ML Importance)`,
-        xLabel: "Driver", yLabel: "Importance Score",
-        series: [{ name:"Drivers", data: rows.map((r:any)=>({ x:r.name, y:Number(r.importance) })) }]
-      },
+      table: rows.map((r:any)=>({
+        driver: r.name,
+        importance: Number(r.importance)
+      })),
+      text: `Top ${topN} churn drivers by model importance.`,
       citations: [{ source:"ModelingDeepDive", ref:"Feature importance" }]
     };
   },
@@ -43,14 +39,21 @@ export const Tools = {
       { strategy: "Contract Conversion", roiPct: 112, savings: 223000000, investment: 199000000, irr: 67 },
       { strategy: "Onboarding Excellence", roiPct: 96, savings: 98000000, investment: 50000000, irr: 58 }
     ];
+    // Return ALL decision metrics; LLM chooses presentation.
+    const table = rows.map((r:any)=>({
+      strategy: r.strategy,
+      investment: r.investment,        // $
+      savings: r.savings,              // $
+      netBenefit: r.savings - r.investment,  // PRIMARY DECISION METRIC
+      roiPct: r.roiPct,                // %
+      irrPct: r.irr                    // %
+    }));
+    // Sort by primary decision metric for quick "optimal" answers
+    table.sort((a,b)=> b.netBenefit - a.netBenefit);
     return {
-      table: rows,
-      chart: {
-        kind: "bar", title: "ROI by Strategy",
-        xLabel: "Strategy", yLabel: "ROI (%)",
-        series: [{ name:"ROI", data: rows.map((r:any)=>({ x:r.strategy, y:r.roiPct })) }]
-      },
-      citations: [{ source:"ScenarioPlanner", ref:"ROI comparison" }]
+      table,
+      text: `Strategy comparison table with investment, savings, net benefit (primary decision metric), ROI%, and IRR%.`,
+      citations: [{ source:"ScenarioPlanner", ref:"ROI/IRR comparison" }]
     };
   },
 
@@ -60,14 +63,12 @@ export const Tools = {
     const delta = baseArpu * (elasticity * (churnDeltaPct/100));
     const newArpu = baseArpu + delta;
     return {
-      table: [{ state:"Current", arpu: baseArpu }, { state:`-${churnDeltaPct}% churn`, arpu:newArpu }],
-      chart: {
-        kind: "bar", title:`ARPU Impact of ${churnDeltaPct}% Churn Reduction`,
-        xLabel:"Scenario", yLabel:"ARPU ($/month)",
-        series: [{ name:"ARPU", data: [{ x:"Current", y:baseArpu }, { x:`-${churnDeltaPct}%`, y:newArpu }] }]
-      },
-      citations: [{ source:"ScenarioPlanner", ref:"ARPU elasticity model" }],
-      text: `ARPU rises by ${money(delta)} to ${money(newArpu)} with ${churnDeltaPct}% churn reduction (elasticity ${elasticity}).`
+      table: [
+        { state:"Current", arpu: baseArpu, elasticity },
+        { state:`-${churnDeltaPct}% churn`, arpu: newArpu, delta, elasticity }
+      ],
+      text: `ARPU scenario table for ${churnDeltaPct}% churn reduction. Current: ${money(baseArpu)}, New: ${money(newArpu)} (delta: ${money(delta)}).`,
+      citations: [{ source:"ScenarioPlanner", ref:"ARPU elasticity model" }]
     };
   },
 
@@ -77,9 +78,9 @@ export const Tools = {
     const gm = 0.62;
     const cltv = (arpu * gm) / churn;
     return {
-      table: [{ metric:"CLTV", value: cltv }],
-      citations: [{ source:"ExecutiveDashboard", ref:"Financial KPIs" }],
-      text: `Estimated CLTV ≈ ${money(cltv)} per customer (ARPU ${money(arpu)}, margin ${pct(gm)}, churn ${pct(churn)}).`
+      table: [{ metric:"CLTV", value: cltv, arpu, grossMarginPct: gm, churnPct: churn }],
+      text: `CLTV with transparent inputs: ${money(cltv)} (ARPU ${money(arpu)}, margin ${pct(gm)}, churn ${pct(churn)}).`,
+      citations: [{ source:"ExecutiveDashboard", ref:"Financial KPIs" }]
     };
   }
 } as const;
