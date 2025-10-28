@@ -6,6 +6,7 @@ import Heatmap from '@/components/charts/Heatmap';
 import { formatCurrency } from '@/utils/formatters';
 import InsightCard from '@/components/shared/InsightCard';
 import CalloutBox from '@/components/shared/CalloutBox';
+import { riskColorMap } from '@/utils/colors';
 import { Users, TrendingUp, Target } from 'lucide-react';
 
 interface Segment {
@@ -101,12 +102,6 @@ export default function SegmentExplorer() {
     setSelectedSegment(null);
   };
 
-  const riskColorMap: Record<string, string> = {
-    'Low': '#D2D2D2',        // Gray for low risk
-    'Medium': '#7823DC',     // Light purple for medium
-    'High': '#7823DC',       // Primary purple for high
-    'Very High': '#5A1BA3',  // Darker purple for very high
-  };
 
   return (
     <div className="container mx-auto px-6 py-8 max-w-7xl">

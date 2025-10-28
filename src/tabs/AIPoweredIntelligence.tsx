@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Sparkles, BarChart3, TrendingUp, Users } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import StrategyCopilot from '@/components/copilot/StrategyCopilot';
+import PoweredByAgents from '@/components/shared/PoweredByAgents';
 import { aiService } from '@/services/aiService';
 
 export default function AIPoweredIntelligence() {
@@ -76,8 +77,13 @@ export default function AIPoweredIntelligence() {
         </div>
       </div>
 
-      {/* Capabilities Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+      {/* Compact footer below Copilot */}
+      <div className="mt-4">
+        <PoweredByAgents compact />
+      </div>
+
+      {/* Capabilities */}
+      <div className="mt-8">
         <div className="card">
           <h3 className="text-xl font-semibold text-text-primary mb-4">What You Can Ask</h3>
           <ul className="space-y-3 text-text-secondary">
@@ -108,47 +114,6 @@ export default function AIPoweredIntelligence() {
           </ul>
         </div>
 
-        <div className="card">
-          <h3 className="text-xl font-semibold text-text-primary mb-4">Powered By Multi-Agent AI</h3>
-          <div className="space-y-3">
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: 'var(--color-accent-primary)' }}>
-                <BarChart3 size={16} className="text-white" />
-              </div>
-              <div>
-                <div className="text-text-primary font-semibold text-sm">Data Agent</div>
-                <div className="text-text-tertiary text-sm">Validates and segments customer data across 54 cohorts</div>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: 'var(--color-accent-primary)' }}>
-                <TrendingUp size={16} className="text-white" />
-              </div>
-              <div>
-                <div className="text-text-primary font-semibold text-sm">ML Agent</div>
-                <div className="text-text-tertiary text-sm">Predicts churn with 85% accuracy (AUC 0.85)</div>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: 'var(--color-accent-primary)' }}>
-                <Sparkles size={16} className="text-white" />
-              </div>
-              <div>
-                <div className="text-text-primary font-semibold text-sm">Strategy Agent</div>
-                <div className="text-text-tertiary text-sm">Generates retention strategies with ROI projections</div>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: 'var(--color-accent-primary)' }}>
-                <Users size={16} className="text-white" />
-              </div>
-              <div>
-                <div className="text-text-primary font-semibold text-sm">QA Agent</div>
-                <div className="text-text-tertiary text-sm">Validates outputs against business constraints</div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

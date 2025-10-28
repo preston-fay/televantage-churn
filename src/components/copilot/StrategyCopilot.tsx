@@ -11,6 +11,7 @@ interface Message {
   citations?: string[];
   relatedSegments?: string[];
   chart?: ChartData;
+  followUps?: string[];
   timestamp: number;
 }
 
@@ -64,6 +65,7 @@ export default function StrategyCopilot({ onClose, embedded = false }: StrategyC
         citations: response.citations,
         relatedSegments: response.relatedSegments,
         chart: response.chart,
+        followUps: response.followUps,
         timestamp: Date.now(),
       };
 
@@ -207,6 +209,26 @@ export default function StrategyCopilot({ onClose, embedded = false }: StrategyC
                         >
                           {segment}
                         </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Follow-up Suggestions */}
+                {message.followUps && message.followUps.length > 0 && (
+                  <div className="mt-3">
+                    <div className="text-xs text-text-tertiary mb-2">You might also ask:</div>
+                    <div className="flex flex-col gap-1.5">
+                      {message.followUps.map((followUp, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setInput(followUp)}
+                          className="text-xs px-3 py-1.5 rounded border hover:bg-bg-tertiary transition-colors text-left"
+                          style={{ borderColor: 'var(--color-border-primary)', color: 'var(--color-text-secondary)' }}
+                          disabled={isThinking}
+                        >
+                          {followUp}
+                        </button>
                       ))}
                     </div>
                   </div>

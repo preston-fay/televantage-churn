@@ -119,8 +119,8 @@ export default function DonutChart({
 
     // Helper function to determine text color based on background
     const getTextColor = (bgColor: string) => {
-      // Light colors (grays) need dark text, dark colors (purples) need light text
-      const lightColors = ['#D2D2D2', '#A5A5A5'];
+      // Light colors (grays and lavender) need dark text, dark purple needs light text
+      const lightColors = ['#D2D2D2', '#A5A5A5', '#C8A5F0'];
       return lightColors.includes(bgColor) ? '#0A0A0A' : '#FFFFFF';
     };
 

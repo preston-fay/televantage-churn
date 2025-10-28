@@ -11,7 +11,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "copilot:dry-run": "node scripts/copilot-dry-run.mjs"
   },
   "keywords": [],
   "author": "",
@@ -30,11 +32,16 @@
     "vite": "^7.1.12"
   },
   "dependencies": {
+    "@types/numeral": "^2.0.5",
     "d3": "^7.9.0",
     "lucide-react": "^0.548.0",
+    "minisearch": "^7.2.0",
+    "numeral": "^2.0.6",
     "openai": "^6.7.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.4"
+    "react-router-dom": "^7.9.4",
+    "vitest": "^4.0.4",
+    "zod": "^4.1.12"
   }
 }
