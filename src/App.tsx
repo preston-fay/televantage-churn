@@ -8,7 +8,7 @@ import AIPoweredIntelligence from './tabs/AIPoweredIntelligence';
 import ModelingDeepDive from './tabs/ModelingDeepDive';
 import SegmentExplorer from './tabs/SegmentExplorer';
 import ProdLLMBadge from './components/ProdLLMBadge';
-import { ProdDiagnostics } from './routes';
+import { ProdDiagnostics, ProdDiagnosticsRAG } from './routes';
 
 function App() {
   return (
@@ -24,6 +24,7 @@ function App() {
               <Route path="/analytics" element={<ModelingDeepDive />} />
               <Route path="/segments" element={<SegmentExplorer />} />
               <Route path="/llm-check" element={<ProdDiagnostics />} />
+              <Route path="/llm-check-rag" element={<ProdDiagnosticsRAG />} />
             </Routes>
           </main>
           <ProdLLMBadge />

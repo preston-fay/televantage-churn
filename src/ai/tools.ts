@@ -1,3 +1,5 @@
+import { getRetriever } from '../rag/retriever';
+
 // Global app data will be set by copilot service
 let AppData: any = null;
 
@@ -82,6 +84,39 @@ export const Tools = {
       text: `CLTV with transparent inputs: ${money(cltv)} (ARPU ${money(arpu)}, margin ${pct(gm)}, churn ${pct(churn)}).`,
       citations: [{ source:"ExecutiveDashboard", ref:"Financial KPIs" }]
     };
+  },
+
+  async rag_search({ query, section_ids, tags, top_k }: {
+    query: string;
+    section_ids?: string[];
+    tags?: string[];
+    top_k?: number;
+  }): Promise<ToolResult> {
+    const retriever = getRetriever();
+
+    try {
+      const results = await retriever.retrieve(query, {
+        topK: top_k,
+        sectionIds: section_ids,
+        tags: tags
+      });
+
+      const context = retriever.formatContext(results);
+      const citations = retriever.getCitations(results);
+
+      return {
+        text: context,
+        citations: citations.map(c => ({
+          source: c.section_id,
+          ref: c.title
+        }))
+      };
+    } catch (error) {
+      return {
+        text: `RAG search failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        citations: []
+      };
+    }
   }
 } as const;
 
@@ -92,5 +127,19 @@ export const toolSpecs = [
   { name:"get_feature_importance", description:"Return top churn drivers from ML model", parameters:{ type:"object", properties:{ topN:{ type:"number", description:"Number of top drivers to return" } } } },
   { name:"get_roi_by_strategy", description:"Return ROI percentage by retention strategy", parameters:{} },
   { name:"compute_arpu_impact", description:"Calculate ARPU impact from churn reduction", parameters:{ type:"object", properties:{ churnDeltaPct:{ type:"number", description:"Percentage churn reduction" } }, required:["churnDeltaPct"] } },
-  { name:"compute_cltv", description:"Compute customer lifetime value from financials", parameters:{} }
+  { name:"compute_cltv", description:"Compute customer lifetime value from financials", parameters:{} },
+  {
+    name:"rag_search",
+    description:"Search the TeleVantage telco churn expert knowledge base. Returns relevant passages with citations from sections: finance, network-economics, pricing-elasticity, lifecycle, modeling, ops, geo.",
+    parameters:{
+      type:"object",
+      properties:{
+        query:{ type:"string", description:"The search query or question" },
+        section_ids:{ type:"array", items:{ type:"string" }, description:"Optional: filter to specific sections" },
+        tags:{ type:"array", items:{ type:"string" }, description:"Optional: filter by tags (ARPU, churn, NPV, IRR, capex, pricing, elasticity, retention, uplift, survival, CRM, NBA, geospatial)" },
+        top_k:{ type:"number", description:"Number of results to return (default: 6)" }
+      },
+      required:["query"]
+    }
+  }
 ];
