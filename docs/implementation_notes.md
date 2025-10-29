@@ -1,4 +1,4 @@
-# TeleVantage Churn Intelligence Platform - Implementation Notes
+# ChurnIQ - Implementation Notes
 
 **Developer Agent:** Claude Code Orchestrator
 **Date:** October 27, 2025
@@ -9,7 +9,7 @@
 
 ## Summary
 
-Successfully implemented the foundational architecture for the TeleVantage Churn Intelligence Platform. The application shell is complete with routing, navigation, shared components, and a fully Kearney-compliant design system. All infrastructure is in place to build out the 5 tabs and 8+ D3.js visualizations.
+Successfully implemented the foundational architecture for ChurnIQ (Turn Data Into Retention). The application shell is complete with routing, navigation, shared components, and a fully Kearney-compliant design system. All infrastructure is in place to build out the 5 tabs and 8+ D3.js visualizations.
 
 **What's Complete:**
 - ✅ React 18 + TypeScript 5 + Vite 5 project structure

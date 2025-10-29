@@ -1,4 +1,4 @@
-# TeleVantage Churn Intelligence Platform - Component Hierarchy
+# ChurnIQ - Component Hierarchy
 
 **Version:** 1.0
 **Date:** October 27, 2025

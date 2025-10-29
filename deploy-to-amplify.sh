@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy TeleVantage Churn Demo to AWS Amplify
+# Deploy ChurnIQ to AWS Amplify
 # Usage: ./deploy-to-amplify.sh
 
 set -euo pipefail

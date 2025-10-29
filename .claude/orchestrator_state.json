@@ -14,9 +14,9 @@
   "consensus_phase": null,
   "intake_path": "intake.yaml",
   "intake_summary": {
-    "project_name": "TeleVantage Churn Intelligence Platform",
+    "project_name": "ChurnIQ",
     "project_type": "webapp",
-    "description": "Executive demo application showcasing AI-powered churn prediction and retention\nstrategy optimization for TeleVantage, a fictional #7 US telecom carrier with\n47.3M subscribers. Built to demonstrate Kearney's multi-agent AI orchestration\ncapabilities and strategic insights derived from advanced churn modeling.\n",
+    "description": "ChurnIQ - Turn Data Into Retention. Executive demo application showcasing AI-powered churn prediction and retention\nstrategy optimization for TeleVantage, a fictional #7 US telecom carrier with\n47.3M subscribers. Built to demonstrate Kearney's multi-agent AI orchestration\ncapabilities and strategic insights derived from advanced churn modeling.\n",
     "requirements": {
       "functional": [
         "5-tab single-page application (SPA) with smooth navigation",

@@ -1,4 +1,4 @@
-# TeleVantage Churn Intelligence Platform - Data Generation
+# ChurnIQ - Data Generation
 
 **Version:** 1.0
 **Date:** October 27, 2025

@@ -1,7 +1,7 @@
 {
-  "name": "televantage-churn-demo",
+  "name": "churniq",
   "version": "1.0.0",
-  "description": "Full-stack web application template",
+  "description": "ChurnIQ - Turn Data Into Retention",
   "main": "index.js",
   "directories": {
     "doc": "docs"

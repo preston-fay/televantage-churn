@@ -1,11 +1,11 @@
 project:
-  name: TeleVantage Churn Intelligence Platform
+  name: ChurnIQ
   type: webapp
   description: |
-    Executive demo application showcasing AI-powered churn prediction and retention
-    strategy optimization for TeleVantage, a fictional #7 US telecom carrier with
-    47.3M subscribers. Built to demonstrate Kearney's multi-agent AI orchestration
-    capabilities and strategic insights derived from advanced churn modeling.
+    ChurnIQ - Turn Data Into Retention. Executive demo application showcasing AI-powered
+    churn prediction and retention strategy optimization for TeleVantage, a fictional #7
+    US telecom carrier with 47.3M subscribers. Built to demonstrate Kearney's multi-agent
+    AI orchestration capabilities and strategic insights derived from advanced churn modeling.
 
   context: |
     This demo application scales real churn analysis results from the telco-churn_v2

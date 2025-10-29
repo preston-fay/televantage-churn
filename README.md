@@ -1,5 +1,5 @@
-# TeleVantage Churn Intelligence Platform
-Full-stack web application template
+# ChurnIQ
+Turn Data Into Retention - AI-Powered Customer Retention Analytics Platform
 
 ## Tech Stack
 - Frontend: React + TypeScript

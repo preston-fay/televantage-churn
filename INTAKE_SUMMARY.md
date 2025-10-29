@@ -1,4 +1,4 @@
-# TeleVantage Churn Intelligence Platform - Intake Summary
+# ChurnIQ - Intake Summary
 
 **Status:** ✅ READY FOR REVIEW
 **Date:** October 27, 2025
@@ -8,7 +8,7 @@
 
 ## Project Overview
 
-**What:** Executive demo application showcasing AI-powered churn prediction and retention strategy optimization for TeleVantage, a fictional #7 US telecom carrier with 47.3M subscribers.
+**What:** ChurnIQ - Turn Data Into Retention. Executive demo application showcasing AI-powered churn prediction and retention strategy optimization for TeleVantage, a fictional #7 US telecom carrier with 47.3M subscribers.
 
 **Why:** Demonstrate Kearney's multi-agent AI orchestration capabilities and strategic insights derived from advanced churn modeling.
 
