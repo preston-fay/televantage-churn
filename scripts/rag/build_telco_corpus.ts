@@ -116,9 +116,11 @@ async function buildCorpus() {
 
   console.log(`✅ Found ${index.length} sections\n`);
 
-  // 3. Chunk corpus
-  console.log('✂️  Chunking corpus (target: 700 tokens, overlap: 100)...');
-  const chunks = processCorpus(markdown, index, 700, 100);
+  // 3. Chunk corpus (increased density for better coverage)
+  const targetTokens = Number(process.env.CHUNK_TOKENS) || 800;
+  const overlapTokens = Number(process.env.OVERLAP_TOKENS) || 120;
+  console.log(`✂️  Chunking corpus (target: ${targetTokens} tokens, overlap: ${overlapTokens})...`);
+  const chunks = processCorpus(markdown, index, targetTokens, overlapTokens);
   console.log(`✅ Created ${chunks.length} chunks\n`);
 
   // 4. Embed chunks

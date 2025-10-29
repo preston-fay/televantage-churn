@@ -38,6 +38,17 @@ export function scoreRoute(query: string): RouteScore {
     "methodology",
     "approach",
     "strategy",
+    "benchmark",
+    "playbook",
+    "lifecycle",
+    "segmentation",
+    "fundamentals",
+    "principles",
+    "concepts",
+    "terminology",
+    "background",
+    "context",
+    "history",
   ];
 
   // Numeric/data keywords that indicate data tools should be used

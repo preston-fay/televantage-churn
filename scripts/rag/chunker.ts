@@ -115,23 +115,61 @@ export function chunkText(
 }
 
 /**
- * Extract section from markdown by section_id using markdown headers
+ * Extract section from markdown by section_id or title using markdown headers
  */
-export function extractSection(markdown: string, sectionId: string): string | null {
-  // Find section by looking for markdown headers followed by content
-  // Sections are typically marked with ## or ### headers
+export function extractSection(markdown: string, sectionId: string, title?: string): string | null {
+  // Strategy 1: Try to match by section_id keywords
+  const sectionKeywords = sectionId.replace(/[-_]/g, ' ').toLowerCase();
 
-  // Simple approach: split by ## headers and find matching section
-  const sections = markdown.split(/^## /m);
+  // Strategy 2: Try to match by full title if provided
+  const titleMatch = title?.toLowerCase();
 
+  // Split by ## headers (keep the header marker for reconstruction)
+  const headerRegex = /^## /gm;
+  const matches = Array.from(markdown.matchAll(headerRegex));
+
+  if (matches.length === 0) {
+    // No sections found, return entire markdown
+    return markdown;
+  }
+
+  // Build section boundaries
+  const sections: Array<{ start: number; end: number; header: string }> = [];
+
+  for (let i = 0; i < matches.length; i++) {
+    const match = matches[i];
+    const start = match.index!;
+    const end = i < matches.length - 1 ? matches[i + 1].index! : markdown.length;
+
+    // Extract header text (first line after ##)
+    const sectionText = markdown.substring(start, end);
+    const headerEnd = sectionText.indexOf('\n');
+    const header = headerEnd > 0
+      ? sectionText.substring(3, headerEnd).trim().toLowerCase()
+      : sectionText.substring(3).trim().toLowerCase();
+
+    sections.push({ start, end, header });
+  }
+
+  // Try to find matching section
   for (const section of sections) {
-    const lines = section.split('\n');
-    const header = lines[0]?.toLowerCase() || '';
+    // Match by section_id keywords
+    if (section.header.includes(sectionKeywords)) {
+      return markdown.substring(section.start, section.end);
+    }
 
-    // Check if header contains section_id keywords
-    if (header.includes(sectionId.replace('-', ' ')) ||
-        header.includes(sectionId.replace('_', ' '))) {
-      return section;
+    // Match by title keywords (more flexible)
+    if (titleMatch && section.header.includes(titleMatch)) {
+      return markdown.substring(section.start, section.end);
+    }
+
+    // Match by individual title words (for complex titles)
+    if (title) {
+      const titleWords = title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+      const matchedWords = titleWords.filter(word => section.header.includes(word));
+      if (matchedWords.length >= Math.ceil(titleWords.length / 2)) {
+        return markdown.substring(section.start, section.end);
+      }
     }
   }
 
@@ -150,10 +188,10 @@ export function processCorpus(
   const allChunks: Chunk[] = [];
 
   for (const sectionMeta of index) {
-    const sectionText = extractSection(markdown, sectionMeta.section_id);
+    const sectionText = extractSection(markdown, sectionMeta.section_id, sectionMeta.title);
 
     if (!sectionText) {
-      console.warn(`Warning: Section ${sectionMeta.section_id} not found in markdown`);
+      console.warn(`Warning: Section ${sectionMeta.section_id} (${sectionMeta.title}) not found in markdown`);
       continue;
     }
 

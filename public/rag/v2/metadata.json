@@ -1,8 +1,8 @@
 {
   "version": "v2",
-  "created": "2025-10-29T12:18:46.082Z",
+  "created": "2025-10-29T12:31:57.168Z",
   "model": "text-embedding-3-large",
-  "chunk_count": 5,
+  "chunk_count": 7,
   "section_count": 7,
-  "total_tokens": 2243
+  "total_tokens": 3295
 }
