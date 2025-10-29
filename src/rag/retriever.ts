@@ -102,9 +102,17 @@ export class RAGRetriever {
     const apiKey = RAG_ENV.OPENAI_API_KEY;
     const model = RAG_ENV.EMBED_MODEL;
 
+    console.log('🔑 getQueryEmbedding called', {
+      hasApiKey: !!apiKey,
+      apiKeyPrefix: apiKey?.substring(0, 10),
+      model,
+      query
+    });
+
     if (!apiKey) {
       throw new Error('VITE_OPENAI_API_KEY not configured');
     }
+
 
     const response = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
@@ -135,7 +143,7 @@ export class RAGRetriever {
       topK = RAG_ENV.TOP_K,
       sectionIds,
       tags,
-      minScore = 0.5
+      minScore = 0.3  // Lowered from 0.5 to handle short queries better
     } = options;
 
     // Load corpus
@@ -174,7 +182,21 @@ export class RAGRetriever {
       return { chunk, section, score };
     });
 
-    // Filter by minimum score and sort by score descending
+    // Sort by score descending to see top scores
+    scored.sort((a, b) => b.score - a.score);
+
+    // Log top 3 scores for debugging
+    console.log(`🎯 Top 3 similarity scores for "${query}":`,
+      scored.slice(0, 3).map(r => ({
+        section: r.section.section_id,
+        score: r.score.toFixed(3),
+        text_preview: r.chunk.text.substring(0, 50)
+      }))
+    );
+
+    console.log(`🎯 Best match score: ${scored[0]?.score.toFixed(3)} (threshold: ${minScore}). Total chunks: ${scored.length}`);
+
+    // Filter by minimum score
     const filtered = scored.filter(result => result.score >= minScore);
     filtered.sort((a, b) => b.score - a.score);
 

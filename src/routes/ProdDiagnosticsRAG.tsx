@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getRetriever } from '../rag/retriever';
 import type { RetrievalResult } from '../rag/retriever';
+import { RAG_ENV } from '../config/ragEnv';
 
 export default function ProdDiagnosticsRAG() {
   const [query, setQuery] = useState('What is customer lifetime value?');
@@ -54,6 +55,19 @@ export default function ProdDiagnosticsRAG() {
         Test the TeleVantage RAG retrieval system. Search the telco churn expert knowledge base
         and verify retrieval + citations work correctly.
       </p>
+
+      {/* Environment Status */}
+      <div style={{
+        padding: '1rem',
+        background: RAG_ENV.OPENAI_API_KEY ? '#d4edda' : '#f8d7da',
+        border: `1px solid ${RAG_ENV.OPENAI_API_KEY ? '#c3e6cb' : '#f5c6cb'}`,
+        borderRadius: '4px',
+        marginBottom: '1rem'
+      }}>
+        <div><strong>OpenAI API Key:</strong> {RAG_ENV.OPENAI_API_KEY ? `✅ Configured (${RAG_ENV.OPENAI_API_KEY.substring(0, 15)}...)` : '❌ NOT CONFIGURED'}</div>
+        <div><strong>Embedding Model:</strong> {RAG_ENV.EMBED_MODEL}</div>
+        <div><strong>Top K Default:</strong> {RAG_ENV.TOP_K}</div>
+      </div>
 
       {/* Corpus Status */}
       <div style={{
