@@ -13,7 +13,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "copilot:dry-run": "node scripts/copilot-dry-run.mjs"
+    "copilot:dry-run": "node scripts/copilot-dry-run.mjs",
+    "rag:build": "tsx scripts/rag/build_telco_corpus.ts",
+    "rag:rebuild": "rm -rf public/rag/v2 && npm run rag:build"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +30,7 @@
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.16",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vite": "^7.1.12"
   },

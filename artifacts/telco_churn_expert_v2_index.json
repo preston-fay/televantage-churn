@@ -1,0 +1,80 @@
+[
+  {
+    "section_id": "finance",
+    "title": "Financial and Economic Framework",
+    "tags": [
+      "finance",
+      "ARPU",
+      "NPV",
+      "IRR",
+      "CLV"
+    ],
+    "summary": "Defines financial metrics (ARPU, churn, CLV) and formulas linking churn reduction to EBITDA and network IRR."
+  },
+  {
+    "section_id": "network-economics",
+    "title": "Network Economics and IRR Models",
+    "tags": [
+      "network",
+      "capex",
+      "fiber",
+      "5G",
+      "irr"
+    ],
+    "summary": "Covers capex structure, utilization curves, and ROI modeling for LTE/5G and fiber builds."
+  },
+  {
+    "section_id": "pricing-elasticity",
+    "title": "Product & Pricing Elasticity",
+    "tags": [
+      "pricing",
+      "elasticity",
+      "promotion",
+      "ARPU"
+    ],
+    "summary": "Explains elasticity coefficients, ARPU optimization, and promotion decay patterns by segment."
+  },
+  {
+    "section_id": "lifecycle",
+    "title": "Customer Lifecycle Analytics",
+    "tags": [
+      "acquisition",
+      "retention",
+      "winback"
+    ],
+    "summary": "Describes analytics across acquisition, usage, care, renewal, churn, and win-back stages."
+  },
+  {
+    "section_id": "modeling",
+    "title": "Modeling Frameworks",
+    "tags": [
+      "churn",
+      "uplift",
+      "survival",
+      "reinforcement"
+    ],
+    "summary": "Outlines modeling approaches including binary, survival, uplift, sequence, and reinforcement learning."
+  },
+  {
+    "section_id": "ops",
+    "title": "Operational Integration",
+    "tags": [
+      "CRM",
+      "NBA",
+      "campaigns",
+      "ROI"
+    ],
+    "summary": "Integrates churn models into CRM workflows, trigger design, and retention campaign ROI measurement."
+  },
+  {
+    "section_id": "geo",
+    "title": "Geospatial & Competitive Analytics",
+    "tags": [
+      "geospatial",
+      "competition",
+      "porting",
+      "coverage"
+    ],
+    "summary": "Defines spatial features and mapping for competitor density, porting, and coverage impact on churn."
+  }
+]

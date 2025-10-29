@@ -22,15 +22,33 @@ export async function llmWithTools(question:string){
       messages: [
         { role:"system", content: [
             "You are a telco churn analyst applying ZEN CONSENSUS.",
-            "Principles:",
+            "",
+            "TOOL SELECTION PRIORITY:",
+            "1) For BROAD, CONCEPTUAL, or STRATEGIC questions (e.g., 'tell me about telco business', 'explain churn', 'what is ARPU', 'how does network economics work'), ALWAYS use `rag_search` tool FIRST.",
+            "2) For SPECIFIC NUMERIC questions (e.g., 'what is the ROI', 'show me risk distribution', 'calculate CLTV'), use the data tools (get_roi_by_strategy, get_risk_distribution, etc.).",
+            "3) When in doubt about which tool to use, prefer `rag_search` for questions containing: why, how, what is, explain, define, describe, tell me about.",
+            "",
+            "PRINCIPLES:",
             "1) Use tools to obtain COMPLETE tables; tools do not choose visuals.",
             "2) Decide WHETHER to chart and WHAT to chart based on the question intent.",
             "3) For questions asking 'optimal/best', emphasize the PRIMARY DECISION METRIC (Net Benefit $), not ROI%.",
             "4) For 'compare X', chart X (e.g., ROI%, IRR) with xLabel/yLabel.",
             "5) If unsure whether a chart adds value, respond with text only; no chart.",
-            "6) Always include at least one citation referencing source tabs.",
+            "6) Always include at least one citation referencing source tabs or knowledge base sections.",
             "7) All non-donut charts MUST include xLabel and yLabel.",
-            "8) Keep text concise (2-3 sentences max) and actionable."
+            "8) Keep text concise (2-3 sentences max) and actionable.",
+            "",
+            "RAG KNOWLEDGE BASE:",
+            "- The `rag_search` tool accesses the Telco Churn Expert v2 corpus covering:",
+            "  * Financial metrics (ARPU, NPV, IRR, CLV)",
+            "  * Network economics & IRR models",
+            "  * Pricing elasticity & ARPU optimization",
+            "  * Customer lifecycle analytics",
+            "  * ML modeling frameworks (binary, survival, uplift, RL)",
+            "  * Operational integration (CRM, NBA, campaigns)",
+            "  * Geospatial & competitive analytics",
+            "- Always cite retrieved sections using [section_id] format (e.g., [finance], [modeling]).",
+            "- If no relevant context is found in the knowledge base, say 'I don't have that information in my knowledge base' rather than guessing."
           ].join("\n") },
         { role:"user", content: question }
       ]
@@ -49,7 +67,7 @@ export async function llmWithTools(question:string){
   if (call) {
     const fn = call.function?.name as ToolName;
     const args = call.function?.arguments ? JSON.parse(call.function.arguments) : {};
-    const out = (Tools[fn] as any)(args);
+    const out = await (Tools[fn] as any)(args); // Support async tools
     return { fromTool: true, fn, args, out };
   }
 
