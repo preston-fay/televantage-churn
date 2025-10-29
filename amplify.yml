@@ -3,10 +3,16 @@ frontend:
   phases:
     preBuild:
       commands:
+        - nvm install 20 || true
+        - nvm use 20 || true
+        - corepack enable || true
         - npm ci
     build:
       commands:
+        # Build Vite app - DO NOT regenerate embeddings (already committed)
         - npm run build
+        # Verify RAG files are present in build output
+        - ls -lh dist/rag/v2/ || echo "Warning: RAG files not in dist"
   artifacts:
     baseDirectory: dist
     files:
@@ -14,3 +20,4 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+      - ~/.cache/**/*
