@@ -9,7 +9,7 @@ import LineChart from '@/components/charts/LineChart';
 import ROICurve from '@/components/charts/ROICurve';
 import AgentTraceDisplay from '@/components/agent/AgentTraceDisplay';
 import { useAgentRun } from '@/hooks/useAgentRun';
-import { calculateContractConversion, calculateOnboardingExcellence, calculateBudgetOptimization, generateROICurve } from '@/utils/scenarioCalculators';
+import { calculateContractConversion, calculateOnboardingExcellence, calculateBudgetOptimization, generateROICurve, calcROIIRR, formatROI } from '@/utils/scenarioCalculators';
 import { formatCurrency, formatPercent } from '@/utils/formatters';
 import { BarChart3, Bot, Lightbulb, CheckCircle, X, Sparkles, DollarSign, Check, TrendingUp, TrendingDown } from 'lucide-react';
 import { getStrategyFinancials, projectArpuDelta, calculateIRR } from '@/services/financialData';
@@ -34,24 +34,33 @@ export default function ScenarioPlanner() {
   const [churnReduction, setChurnReduction] = useState(0.30); // 30% default
   const [programInvestment, setProgramInvestment] = useState(50_000_000); // $50M default
 
-  // Calculate Scenario 1 results
-  const resultsC = useMemo(() => {
-    return calculateBudgetOptimization(
-      {
-        retention_budget: retentionBudget,
-        cost_per_intervention: costPerIntervention,
-      },
-      assumptions
-    );
-  }, [retentionBudget, costPerIntervention, assumptions]);
+  // Calculate Scenario 1 results with S-curve calculator
+  const roiRawC = useMemo(() => calcROIIRR({
+    annualBudget: retentionBudget,
+    costPerIntervention,
+    conversionRatePct: assumptions.save_rate * 100, // 15% save rate
+    baseCustomers: 47_300_000,
+    arpu: assumptions.arpu,
+    marginPct: assumptions.gross_margin,
+    horizonMonths: 36, // 3-year horizon
+    halfSaturationBudget: 150_000_000,   // B50 for Scenario 1 (Budget Optimization)
+    maxInterventionsPerYear: Math.floor(47_300_000 * 0.30) // 30% of customer base
+  }), [retentionBudget, costPerIntervention, assumptions.save_rate, assumptions.arpu, assumptions.gross_margin]);
+
+  // Keep legacy resultsC for compatibility with existing UI
+  const resultsC = useMemo(() => ({
+    interventions: roiRawC.interventions,
+    customers_saved: roiRawC.customersSaved,
+    annual_savings: roiRawC.annualSavings,
+    roi: roiRawC.roiPct / 100, // Convert to decimal for compatibility
+  }), [roiRawC]);
 
   // Financial metrics for Scenario 1 (Budget Optimization)
   const financialsC = useMemo(() => {
-    const irr = calculateIRR(retentionBudget, resultsC.annual_savings, 3);
     const churnDelta = resultsC.customers_saved / 47_300_000; // as fraction
     const arpuDelta = projectArpuDelta(churnDelta, null, assumptions);
-    return { irr, arpuDelta };
-  }, [resultsC, retentionBudget, assumptions]);
+    return { irr: roiRawC.irrPct / 100, arpuDelta }; // IRR from S-curve calculator
+  }, [roiRawC, resultsC.customers_saved, assumptions]);
 
   // Generate ROI curve for Scenario 1
   const roiCurveData = useMemo(() => {
@@ -67,7 +76,27 @@ export default function ScenarioPlanner() {
     return optimal.budget;
   }, [roiCurveData, retentionBudget]);
 
-  // Calculate Scenario 2 results
+  // Calculate Scenario 2 results with S-curve calculator
+  const M2M_CUSTOMERS = 47_300_000 * 0.42; // 42% are month-to-month
+  const roiRaw2 = useMemo(() => {
+    // For contract conversion, budget = potential conversions * incentive cost
+    const potentialConversions = M2M_CUSTOMERS * conversionRate;
+    const implicitBudget = potentialConversions * incentiveCost;
+
+    return calcROIIRR({
+      annualBudget: implicitBudget,
+      costPerIntervention: incentiveCost,
+      conversionRatePct: 100, // 100% of targeted customers convert (already filtered by conversionRate)
+      baseCustomers: M2M_CUSTOMERS,
+      arpu: assumptions.arpu,
+      marginPct: assumptions.gross_margin * 0.6, // Contract customers have ~60% lower churn
+      horizonMonths: 36,
+      halfSaturationBudget: 200_000_000, // B50 for Scenario 2 (Contract Conversion)
+      maxInterventionsPerYear: Math.floor(M2M_CUSTOMERS * 0.30)
+    });
+  }, [conversionRate, incentiveCost, assumptions.arpu, assumptions.gross_margin]);
+
+  // Keep legacy results for compatibility with existing UI
   const results = useMemo(() => {
     return calculateContractConversion(
       {
@@ -80,11 +109,10 @@ export default function ScenarioPlanner() {
 
   // Financial metrics for Scenario 2 (Contract Conversion)
   const financials = useMemo(() => {
-    const irr = calculateIRR(results.total_cost, results.annual_savings, 3);
     const churnDelta = results.churn_reduction;
     const arpuDelta = projectArpuDelta(churnDelta, null, assumptions);
-    return { irr, arpuDelta };
-  }, [results, assumptions]);
+    return { irr: roiRaw2.irrPct / 100, arpuDelta }; // IRR from S-curve calculator
+  }, [roiRaw2, results.churn_reduction, assumptions]);
 
   // Prepare chart data for Scenario 2
   const chartData = useMemo(() => {
@@ -124,7 +152,27 @@ export default function ScenarioPlanner() {
       ? (results.total_cost / (results.annual_savings / 12)).toFixed(1)
       : 'N/A';
 
-  // Calculate Scenario 3 results
+  // Calculate Scenario 3 results with S-curve calculator
+  const EARLY_CUSTOMERS = 47_300_000 * 0.09; // 9% are 0-3 months tenure
+  const roiRaw3 = useMemo(() => {
+    // For onboarding, budget is program investment
+    // Cost per intervention is program investment divided by potential reach
+    const costPerCustomer = programInvestment / EARLY_CUSTOMERS;
+
+    return calcROIIRR({
+      annualBudget: programInvestment,
+      costPerIntervention: Math.max(1, costPerCustomer), // Avoid division by zero
+      conversionRatePct: churnReduction * 100, // Churn reduction % becomes conversion %
+      baseCustomers: EARLY_CUSTOMERS,
+      arpu: assumptions.arpu,
+      marginPct: assumptions.gross_margin,
+      horizonMonths: 36,
+      halfSaturationBudget: 80_000_000, // B50 for Scenario 3 (Onboarding Excellence)
+      maxInterventionsPerYear: Math.floor(EARLY_CUSTOMERS * 0.90) // Can reach 90% of early customers
+    });
+  }, [churnReduction, programInvestment, assumptions.arpu, assumptions.gross_margin]);
+
+  // Keep legacy resultsB for compatibility with existing UI
   const resultsB = useMemo(() => {
     return calculateOnboardingExcellence(
       {
@@ -137,11 +185,10 @@ export default function ScenarioPlanner() {
 
   // Financial metrics for Scenario 3 (Onboarding Excellence)
   const financialsB = useMemo(() => {
-    const irr = calculateIRR(programInvestment, resultsB.annual_savings, 3);
     const churnDelta = resultsB.customers_saved / 47_300_000; // as fraction
     const arpuDelta = projectArpuDelta(churnDelta, null, assumptions);
-    return { irr, arpuDelta };
-  }, [resultsB, programInvestment, assumptions]);
+    return { irr: roiRaw3.irrPct / 100, arpuDelta }; // IRR from S-curve calculator
+  }, [roiRaw3, resultsB.customers_saved, assumptions]);
 
   // Prepare line chart data for Scenario 3
   const tenureChartData = useMemo(() => {
