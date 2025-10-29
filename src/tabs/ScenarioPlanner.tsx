@@ -692,6 +692,17 @@ export default function ScenarioPlanner() {
         </ChartContainer>
       </div>
 
+      {/* DEV DEBUG CHIP */}
+      {import.meta.env.DEV && (
+        <div className="fixed bottom-3 left-3 text-xs bg-slate-800 text-white px-3 py-2 rounded shadow-lg font-mono z-50">
+          <div className="font-bold mb-1">Scenario 1 Inputs:</div>
+          <div>Budget: ${(retentionBudget / 1_000_000).toFixed(1)}M</div>
+          <div>CPI: ${costPerIntervention}</div>
+          <div>ROI: {(resultsC.roi * 100).toFixed(1)}%</div>
+          <div>IRR: {(financialsC.irr * 100).toFixed(1)}%</div>
+        </div>
+      )}
+
       {/* DYNAMIC AI WORKFLOW PANEL */}
       {workflowOpen && (
         <div
