@@ -3,9 +3,6 @@ frontend:
   phases:
     preBuild:
       commands:
-        - 'if [ -s "$NVM_DIR/nvm.sh" ]; then . "$NVM_DIR/nvm.sh"; fi || true'
-        - 'nvm install 20 && nvm use 20 || true'
-        - corepack enable || true
         - npm ci --no-audit --no-fund
     build:
       commands:
@@ -18,4 +15,3 @@ frontend:
     paths:
       - node_modules/**/*
       - ~/.npm/**/*
-      - ~/.cache/**/*
