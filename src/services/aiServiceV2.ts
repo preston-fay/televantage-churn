@@ -104,9 +104,18 @@ export async function askCopilot({ text }: { text: string }): Promise<Answer> {
  * Handle RAG path for conceptual questions
  */
 async function handleRAGPath(text: string): Promise<Answer> {
+  console.log("🔍 handleRAGPath called for:", text);
+
   const ragResult = await Tools.rag_search({
     query: text,
     top_k: Number(import.meta.env.VITE_RAG_TOP_K) || 6,
+  });
+
+  console.log("📦 RAG result:", {
+    hasText: !!ragResult.text,
+    textLength: ragResult.text?.length || 0,
+    citationsCount: ragResult.citations?.length || 0,
+    citations: ragResult.citations
   });
 
   if (!ragResult.text || !ragResult.text.trim()) {
@@ -119,10 +128,18 @@ async function handleRAGPath(text: string): Promise<Answer> {
     title: c.ref,
   }));
 
+  console.log("✏️ Formatted citations:", citations);
+
   Telemetry.ragSuccess(text, citations.length);
 
   // Compose grounded answer
   const answer = composeGroundedAnswer(text, ragResult.text, citations);
+
+  console.log("📝 Composed answer:", {
+    textLength: answer.text.length,
+    citationsCount: answer.citations.length,
+    citations: answer.citations
+  });
 
   AnswerSchema.parse(answer);
   return answer;

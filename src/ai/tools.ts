@@ -113,8 +113,11 @@ export const Tools = {
       };
     } catch (error) {
       return {
-        text: `RAG search failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        citations: []
+        text: `RAG search failed: ${error instanceof Error ? error.message : 'Unknown error'}. Please check that the OpenAI API key is configured and the corpus is loaded.`,
+        citations: [{
+          source: 'system',
+          ref: 'Error: RAG unavailable'
+        }]
       };
     }
   }

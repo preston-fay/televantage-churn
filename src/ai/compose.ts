@@ -51,11 +51,13 @@ export function composeGroundedAnswer(
   const summaryText = summarize(context);
   const text = `Based on the Telco Churn Expert corpus:\n\n${summaryText}\n\n${citeStr}`;
 
-  // Format citations for Answer schema
-  const formattedCitations = uniqueCitations.map((c) => ({
-    source: c.section_id,
-    ref: c.title,
-  }));
+  // Format citations for Answer schema (ensure at least one citation)
+  const formattedCitations = uniqueCitations.length > 0
+    ? uniqueCitations.map((c) => ({
+        source: c.section_id,
+        ref: c.title,
+      }))
+    : [{ source: "system", ref: "No relevant sources found" }];
 
   // Generate context-aware follow-ups
   const followUps = generateFollowUps(citations);
