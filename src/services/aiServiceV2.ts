@@ -53,6 +53,28 @@ async function withTimeout<T>(
 }
 
 /**
+ * Strip markdown formatting from text
+ */
+function stripMarkdown(text: string): string {
+  return text
+    // Remove headers (##, ###, etc.)
+    .replace(/^#{1,6}\s+/gm, '')
+    // Remove bold/italic (**text**, *text*, __text__, _text_)
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')
+    .replace(/(\*|_)(.*?)\1/g, '$2')
+    // Remove inline code (`code`)
+    .replace(/`([^`]+)`/g, '$1')
+    // Remove links [text](url)
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+    // Remove list markers (-, *, 1., etc.)
+    .replace(/^[\s]*[-*+]\s+/gm, '')
+    .replace(/^[\s]*\d+\.\s+/gm, '')
+    // Clean up extra whitespace
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/**
  * Main copilot entry point with scored routing
  */
 export async function askCopilot({ text }: { text: string }): Promise<Answer> {
@@ -203,7 +225,21 @@ async function handleHybridPath(text: string): Promise<Answer> {
 
     if (ragText) {
       // Extract just the first chunk of RAG context (don't overwhelm with full context)
-      const ragSummary = ragText.split(/\n---\n/)[0].trim();
+      let ragSummary = ragText.split(/\n---\n/)[0].trim();
+
+      // Remove metadata lines and strip markdown
+      ragSummary = ragSummary
+        .split("\n")
+        .filter((line) => !line.startsWith("(relevance:") && !line.startsWith("["))
+        .join("\n")
+        .trim();
+      ragSummary = stripMarkdown(ragSummary);
+
+      // Limit length for conciseness
+      if (ragSummary.length > 300) {
+        ragSummary = ragSummary.substring(0, 297) + "...";
+      }
+
       if (ragSummary) {
         text += (text ? "\n\n" : "") + ragSummary;
       }

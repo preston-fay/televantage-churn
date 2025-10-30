@@ -5,6 +5,28 @@
 import type { Answer } from "./schemas";
 
 /**
+ * Strip markdown formatting from text
+ */
+function stripMarkdown(text: string): string {
+  return text
+    // Remove headers (##, ###, etc.)
+    .replace(/^#{1,6}\s+/gm, '')
+    // Remove bold/italic (**text**, *text*, __text__, _text_)
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')
+    .replace(/(\*|_)(.*?)\1/g, '$2')
+    // Remove inline code (`code`)
+    .replace(/`([^`]+)`/g, '$1')
+    // Remove links [text](url)
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+    // Remove list markers (-, *, 1., etc.)
+    .replace(/^[\s]*[-*+]\s+/gm, '')
+    .replace(/^[\s]*\d+\.\s+/gm, '')
+    // Clean up extra whitespace
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/**
  * Summarize RAG context into a concise answer (max 3 sentences)
  */
 function summarize(context: string): string {
@@ -20,12 +42,15 @@ function summarize(context: string): string {
     .join("\n")
     .trim();
 
+  // Strip markdown formatting
+  const cleanText = stripMarkdown(firstPassage);
+
   // Limit to ~300 chars for conciseness
-  if (firstPassage.length > 300) {
-    return firstPassage.substring(0, 297) + "...";
+  if (cleanText.length > 300) {
+    return cleanText.substring(0, 297) + "...";
   }
 
-  return firstPassage;
+  return cleanText;
 }
 
 /**
