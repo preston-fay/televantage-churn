@@ -2,7 +2,7 @@
 
 ## Overview
 
-This implementation adds a production-ready Retrieval Augmented Generation (RAG) layer to the TeleVantage app using the telco churn expert knowledge base.
+This implementation adds a production-ready Retrieval Augmented Generation (RAG) layer to the ChurnIQ app using the telco churn expert knowledge base.
 
 ## Architecture
 

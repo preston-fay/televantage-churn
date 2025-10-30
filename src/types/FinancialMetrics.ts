@@ -1,7 +1,7 @@
 /**
  * Financial Metrics Type Definitions
  *
- * Core telco KPIs for TeleVantage churn intelligence platform
+ * Core telco KPIs for ChurnIQ churn intelligence platform
  */
 
 export interface FinancialMetrics {

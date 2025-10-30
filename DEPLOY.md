@@ -1,4 +1,4 @@
-# Deployment Guide: TeleVantage Churn Intelligence Platform
+# Deployment Guide: ChurnIQ Churn Intelligence Platform
 
 This guide covers deployment to AWS Amplify for the existing app at `d1p7obkrs6acpc.amplifyapp.com`.
 
@@ -37,7 +37,7 @@ This script will:
 3. **Deploy manually:**
    - Click on the `main` branch
    - Click "Deploy without Git provider"
-   - Upload: `artifacts/releases/televantage_amplify_20251028_151145.zip`
+   - Upload: `artifacts/releases/churniq_amplify_20251028_151145.zip`
    - Click "Save and deploy"
 
 4. **Monitor deployment:**
@@ -56,7 +56,7 @@ This script will:
 export AWS_REGION=us-east-1
 DOMAIN="d1p7obkrs6acpc.amplifyapp.com"
 BRANCH="main"
-BUNDLE="artifacts/releases/televantage_amplify_20251028_151145.zip"
+BUNDLE="artifacts/releases/churniq_amplify_20251028_151145.zip"
 
 # Find app ID
 APP_ID=$(aws amplify list-apps \
@@ -111,7 +111,7 @@ git push origin main
 
 ### Current Bundle
 ```
-File: artifacts/releases/televantage_amplify_20251028_151145.zip
+File: artifacts/releases/churniq_amplify_20251028_151145.zip
 Size: 655 KB
 Contents: Production build (dist/)
 ```
@@ -130,7 +130,7 @@ dist/
 
 ### Verify Bundle
 ```bash
-unzip -l artifacts/releases/televantage_amplify_20251028_151145.zip | head -20
+unzip -l artifacts/releases/churniq_amplify_20251028_151145.zip | head -20
 ```
 
 ---
@@ -310,5 +310,5 @@ After successful deployment:
 
 - **AWS Amplify Docs:** https://docs.aws.amazon.com/amplify/
 - **Amplify Console:** https://console.aws.amazon.com/amplify/home
-- **TeleVantage Snapshot:** `v2025.10.28-ai-demo-stable`
+- **ChurnIQ Snapshot:** `v2025.10.28-ai-demo-stable`
 - **Restore Script:** `./scripts/restore-stable.sh v2025.10.28-ai-demo-stable`

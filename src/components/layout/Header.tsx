@@ -8,7 +8,7 @@ export default function Header() {
         <div className="flex items-start justify-between mb-4">
           <div className="flex flex-col justify-center">
             <h1 className="text-2xl font-bold text-text-primary leading-tight">
-              TeleVantage Churn Intelligence Platform
+              ChurnIQ Churn Intelligence Platform
             </h1>
             <p className="text-sm text-text-tertiary mt-0.5">
               AI-Powered Customer Retention Analytics

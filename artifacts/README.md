@@ -1,6 +1,6 @@
 # Demo Snapshot Artifacts
 
-This directory contains immutable snapshots of the TeleVantage Churn Intelligence Platform at stable milestones.
+This directory contains immutable snapshots of the ChurnIQ Churn Intelligence Platform at stable milestones.
 
 ## Current Snapshot
 

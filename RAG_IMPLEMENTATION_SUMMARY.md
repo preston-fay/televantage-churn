@@ -4,7 +4,7 @@
 
 ### What Was Built
 
-A complete Retrieval Augmented Generation (RAG) system integrated into the TeleVantage churn intelligence platform, grounding the Copilot's responses in expert telco knowledge.
+A complete Retrieval Augmented Generation (RAG) system integrated into the ChurnIQ churn intelligence platform, grounding the Copilot's responses in expert telco knowledge.
 
 ---
 

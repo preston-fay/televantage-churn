@@ -1,14 +1,14 @@
-# TeleVantage Churn Intelligence Platform - Intake Summary
+# ChurnIQ Churn Intelligence Platform - Intake Summary
 
 **Status:** ✅ READY FOR REVIEW
 **Date:** October 27, 2025
-**Project Location:** `/Users/pfay01/Projects/televantage-churn-demo`
+**Project Location:** `/Users/pfay01/Projects/churniq-churn-demo`
 
 ---
 
 ## Project Overview
 
-**What:** Executive demo application showcasing AI-powered churn prediction and retention strategy optimization for TeleVantage, a fictional #7 US telecom carrier with 47.3M subscribers.
+**What:** Executive demo application showcasing AI-powered churn prediction and retention strategy optimization for ChurnIQ, a fictional #7 US telecom carrier with 47.3M subscribers.
 
 **Why:** Demonstrate Kearney's multi-agent AI orchestration capabilities and strategic insights derived from advanced churn modeling.
 
@@ -21,7 +21,7 @@
 ## Key Specifications
 
 ### Business Context
-- **Company:** TeleVantage (#7 US carrier, 47.3M subscribers)
+- **Company:** ChurnIQ (#7 US carrier, 47.3M subscribers)
 - **Annual Churn Cost:** $1.42B (baseline)
 - **AI Savings Opportunity:** $312M (22% reduction)
 - **Model Performance:** 85% AUC (Logistic Regression)
@@ -211,7 +211,7 @@
 ## Next Steps
 
 1. **Review intake.yaml** - Validate specifications with stakeholders
-2. **Start orchestrator workflow:** `cd ~/Projects/televantage-churn-demo && orchestrator run start --intake intake.yaml`
+2. **Start orchestrator workflow:** `cd ~/Projects/churniq-churn-demo && orchestrator run start --intake intake.yaml`
 3. **Planning Phase:** Architect agent designs system architecture
 4. **Development Phase:** Developer agent implements 5 tabs + 7 charts
 5. **QA Phase:** QA agent validates functionality and design
@@ -233,7 +233,7 @@
 **To start the workflow:**
 
 ```bash
-cd ~/Projects/televantage-churn-demo
+cd ~/Projects/churniq-churn-demo
 orchestrator run start --intake intake.yaml
 ```
 

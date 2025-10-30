@@ -133,7 +133,7 @@ export const toolSpecs = [
   { name:"compute_cltv", description:"Compute customer lifetime value from financials", parameters:{} },
   {
     name:"rag_search",
-    description:"Search the TeleVantage telco churn expert knowledge base. Returns relevant passages with citations from sections: finance, network-economics, pricing-elasticity, lifecycle, modeling, ops, geo.",
+    description:"Search the ChurnIQ telco churn expert knowledge base. Returns relevant passages with citations from sections: finance, network-economics, pricing-elasticity, lifecycle, modeling, ops, geo.",
     parameters:{
       type:"object",
       properties:{

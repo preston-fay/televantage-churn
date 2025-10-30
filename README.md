@@ -1,4 +1,4 @@
-# TeleVantage Churn Intelligence Platform
+# ChurnIQ Churn Intelligence Platform
 Full-stack web application template
 
 ## Tech Stack

@@ -1,4 +1,4 @@
-# TeleVantage Churn Intelligence Platform - Data Generation
+# ChurnIQ Churn Intelligence Platform - Data Generation
 
 **Version:** 1.0
 **Date:** October 27, 2025
@@ -8,7 +8,7 @@
 
 ## Overview
 
-This document describes the methodology for scaling real churn analysis results from the **telco-churn_v2** project (7,044 customers) to enterprise scale (**47.3M customers**) for the TeleVantage demo application.
+This document describes the methodology for scaling real churn analysis results from the **telco-churn_v2** project (7,044 customers) to enterprise scale (**47.3M customers**) for the ChurnIQ demo application.
 
 **Scale Factor:** 6,714x
 **Source Project:** `/Users/pfay01/Projects/telco-churn_v2`
@@ -406,7 +406,7 @@ const totalHighRiskM2M = highRiskM2M.reduce((sum, s) => sum + s.customers, 0);
 To regenerate demo data (e.g., after source data updates):
 
 ```bash
-cd ~/Projects/televantage-churn-demo
+cd ~/Projects/churniq-churn-demo
 python3 scripts/generate_demo_data.py
 ```
 
@@ -419,7 +419,7 @@ python3 scripts/generate_demo_data.py
 
 ## Appendix: Scale Factor Calculation
 
-**Target:** TeleVantage with 47.3M subscribers
+**Target:** ChurnIQ with 47.3M subscribers
 
 **Derivation:**
 ```

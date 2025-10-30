@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TeleVantage Churn Intelligence Platform - Demo Data Generator
+ChurnIQ Churn Intelligence Platform - Demo Data Generator
 
 This script scales real churn analysis results from the telco-churn_v2 project
 (7,044 customers) to enterprise scale (47.3M customers) with a 6,714x scale factor.
@@ -403,7 +403,7 @@ def generate_feature_importance_json() -> Dict[str, Any]:
 def main():
     """Main execution function."""
     print("=" * 80)
-    print("TeleVantage Demo Data Generator")
+    print("ChurnIQ Demo Data Generator")
     print("=" * 80)
     print(f"Scaling: {BASE_CUSTOMERS:,} → {TARGET_CUSTOMERS:,} customers")
     print(f"Scale Factor: {SCALE_FACTOR}x")

@@ -10,7 +10,7 @@ All deployment assets have been created and are ready for AWS Amplify deployment
 
 ### 1. Production Bundle
 ```
-File: artifacts/releases/televantage_amplify_20251028_151145.zip
+File: artifacts/releases/churniq_amplify_20251028_151145.zip
 Size: 655 KB
 Created: 2025-10-28 15:11 UTC
 ```
@@ -74,7 +74,7 @@ File: DEPLOY.md
 2. Select app with domain: `d1p7obkrs6acpc.amplifyapp.com`
 3. Click on `main` branch
 4. Click "Deploy without Git provider"
-5. Upload: `artifacts/releases/televantage_amplify_20251028_151145.zip`
+5. Upload: `artifacts/releases/churniq_amplify_20251028_151145.zip`
 6. Click "Save and deploy"
 
 ### Option 3: AWS CLI Commands (Manual)
@@ -185,7 +185,7 @@ After deployment completes, verify these features:
 
 ### If You Prefer Web Console:
 
-1. Upload bundle: `artifacts/releases/televantage_amplify_20251028_151145.zip`
+1. Upload bundle: `artifacts/releases/churniq_amplify_20251028_151145.zip`
 2. Use AWS Amplify Console: https://console.aws.amazon.com/amplify/home
 3. Follow Option 2 instructions above
 

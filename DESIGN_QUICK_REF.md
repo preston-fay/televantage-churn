@@ -1,4 +1,4 @@
-# TeleVantage Design System Quick Reference
+# ChurnIQ Design System Quick Reference
 
 **Theme:** Kearney Dark Theme
 **Target:** Executive presentations (C-suite)

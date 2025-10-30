@@ -52,7 +52,7 @@ export default function ProdDiagnosticsRAG() {
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <h1 style={{ marginBottom: '1rem' }}>RAG Diagnostics</h1>
       <p style={{ color: '#666', marginBottom: '2rem' }}>
-        Test the TeleVantage RAG retrieval system. Search the telco churn expert knowledge base
+        Test the ChurnIQ RAG retrieval system. Search the telco churn expert knowledge base
         and verify retrieval + citations work correctly.
       </p>
 

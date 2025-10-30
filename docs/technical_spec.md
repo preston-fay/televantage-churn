@@ -1,4 +1,4 @@
-# TeleVantage Churn Intelligence Platform - Technical Specification
+# ChurnIQ Churn Intelligence Platform - Technical Specification
 
 **Version:** 1.0
 **Date:** October 27, 2025
@@ -25,7 +25,7 @@
 ## Project Overview
 
 ### Purpose
-Executive demo application showcasing AI-powered churn prediction and retention strategy optimization for TeleVantage (fictional #7 US telecom carrier, 47.3M subscribers).
+Executive demo application showcasing AI-powered churn prediction and retention strategy optimization for ChurnIQ (fictional #7 US telecom carrier, 47.3M subscribers).
 
 ### Target Audience
 C-suite executives (CEO, CFO, CMO) - non-technical stakeholders
@@ -987,6 +987,6 @@ describe('calculateContractConversion', () => {
 
 ## Conclusion
 
-This technical specification provides comprehensive implementation details for the TeleVantage Churn Intelligence Platform. All components, charts, calculations, and data structures are fully specified and ready for development.
+This technical specification provides comprehensive implementation details for the ChurnIQ Churn Intelligence Platform. All components, charts, calculations, and data structures are fully specified and ready for development.
 
 **Next Phase:** Data Engineering (Generate scaled demo data)

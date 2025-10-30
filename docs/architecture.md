@@ -1,4 +1,4 @@
-# TeleVantage Churn Intelligence Platform - System Architecture
+# ChurnIQ Churn Intelligence Platform - System Architecture
 
 **Version:** 1.0
 **Date:** October 27, 2025
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-The TeleVantage Churn Intelligence Platform is a single-page React application designed to showcase AI-powered churn prediction and retention strategy optimization for C-suite executives. The application presents scaled analytics from a real churn modeling project (telco-churn_v2) in an executive-friendly format with interactive scenario planning capabilities.
+The ChurnIQ Churn Intelligence Platform is a single-page React application designed to showcase AI-powered churn prediction and retention strategy optimization for C-suite executives. The application presents scaled analytics from a real churn modeling project (telco-churn_v2) in an executive-friendly format with interactive scenario planning capabilities.
 
 **Key Characteristics:**
 - **Static demo application** (no live backend required)
@@ -162,7 +162,7 @@ Static JSON Files (Demo Data)
 ### Data Scaling Methodology
 
 **Base:** 7,044 customers (telco-churn_v2)
-**Target:** 47,300,000 customers (TeleVantage)
+**Target:** 47,300,000 customers (ChurnIQ)
 **Scale Factor:** 6,714x
 
 **Scaling Rules:**
@@ -529,7 +529,7 @@ User Adjusts Slider (Scenario A: Contract Conversion 20%)
 ## Appendix B: File Structure
 
 ```
-televantage-churn-demo/
+churniq-churn-demo/
 ├── public/
 │   └── favicon.ico
 ├── src/
@@ -594,7 +594,7 @@ televantage-churn-demo/
 
 ## Conclusion
 
-The TeleVantage Churn Intelligence Platform architecture is designed for:
+The ChurnIQ Churn Intelligence Platform architecture is designed for:
 - **Simplicity:** JAMstack pattern, no backend complexity
 - **Performance:** CDN delivery, optimized bundles, fast charts
 - **Maintainability:** TypeScript, component architecture, clear separation

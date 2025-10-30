@@ -91,7 +91,7 @@ async function batchEmbed(
  * Main build function
  */
 async function buildCorpus() {
-  console.log('🚀 Building TeleVantage RAG corpus...\n');
+  console.log('🚀 Building ChurnIQ RAG corpus...\n');
 
   // 1. Read environment
   const apiKey = process.env.VITE_OPENAI_API_KEY;
