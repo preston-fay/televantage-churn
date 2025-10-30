@@ -144,7 +144,7 @@ export const Tools = {
     };
   },
 
-  get_segment_analysis({ contract_type, tenure_band }: { contract_type?: string; tenure_band?: string } = {}): ToolResult {
+  get_segment_analysis({ contract_type, tenure_band, risk_level, value_tier }: { contract_type?: string; tenure_band?: string; risk_level?: string; value_tier?: string } = {}): ToolResult {
     let segments = AppData?.segments || [];
 
     // Filter by contract type if specified
@@ -178,9 +178,49 @@ export const Tools = {
       segments = segments.filter((s:any) => s.tenure_band === targetTenure);
     }
 
+    // Filter by risk level if specified
+    if (risk_level) {
+      const normalized = risk_level.toLowerCase();
+      // Map common risk phrases to actual data values
+      let targetRisk = '';
+
+      if (normalized.includes('low')) {
+        targetRisk = 'Low';
+      } else if (normalized.includes('medium') || normalized.includes('med')) {
+        targetRisk = 'Medium';
+      } else if (normalized.includes('high') && !normalized.includes('very')) {
+        targetRisk = 'High';
+      } else if (normalized.includes('very high') || normalized.includes('very-high')) {
+        targetRisk = 'Very High';
+      }
+
+      if (targetRisk) {
+        segments = segments.filter((s:any) => s.risk_level === targetRisk);
+      }
+    }
+
+    // Filter by value tier if specified
+    if (value_tier) {
+      const normalized = value_tier.toLowerCase();
+      // Map common value phrases to actual data values
+      let targetValue = '';
+
+      if (normalized.includes('low')) {
+        targetValue = 'Low';
+      } else if (normalized.includes('med') || normalized.includes('medium')) {
+        targetValue = 'Med';
+      } else if (normalized.includes('high')) {
+        targetValue = 'High';
+      }
+
+      if (targetValue) {
+        segments = segments.filter((s:any) => s.value_tier === targetValue);
+      }
+    }
+
     if (segments.length === 0) {
       return {
-        text: `No segments found matching criteria: ${contract_type || 'all contracts'}, ${tenure_band || 'all tenure bands'}. Available tenure bands: 0-3m, 4-12m, 13-24m, 25-48m, 49-72m. Available contracts: M2M, 1yr, 2yr.`,
+        text: `No segments found matching criteria: ${contract_type || 'all contracts'}, ${tenure_band || 'all tenure bands'}, ${risk_level || 'all risk levels'}, ${value_tier || 'all value tiers'}. Available: tenure (0-3m, 4-12m, 13-24m, 25-48m, 49-72m), contracts (M2M, 1yr, 2yr), risk (Low, Medium, High, Very High), value (Low, Med, High).`,
         citations: [{ source: "ExecutiveDashboard", ref: "Segment analysis" }]
       };
     }
@@ -300,7 +340,7 @@ export const toolSpecs = [
   { name:"get_roi_by_strategy", description:"Return ROI percentage by retention strategy", parameters:{} },
   { name:"compute_arpu_impact", description:"Calculate ARPU impact from churn reduction", parameters:{ type:"object", properties:{ churnDeltaPct:{ type:"number", description:"Percentage churn reduction" } }, required:["churnDeltaPct"] } },
   { name:"compute_cltv", description:"Compute customer lifetime value from financials", parameters:{} },
-  { name:"get_segment_analysis", description:"Analyze customer segments by contract type (month-to-month, annual) and/or tenure band", parameters:{ type:"object", properties:{ contract_type:{ type:"string", description:"Contract type filter: 'month-to-month', 'MTM', 'annual', 'yearly'" }, tenure_band:{ type:"string", description:"Tenure band filter: '0-3 Months', '4-12 Months', etc." } } } },
+  { name:"get_segment_analysis", description:"Analyze customer segments by contract type, tenure band, risk level, and/or value tier", parameters:{ type:"object", properties:{ contract_type:{ type:"string", description:"Contract type. Examples: 'month-to-month', 'MTM', 'M2M', 'annual', 'yearly', '1-year', '2-year'" }, tenure_band:{ type:"string", description:"Tenure band. Examples: 'early-tenure', 'early', 'new', '0-3m', 'young', '4-12m', 'mid-tenure', '13-24m', 'mature', '25-48m', 'long-term', 'established', '49-72m'" }, risk_level:{ type:"string", description:"Risk level. Examples: 'low-risk', 'low', 'medium-risk', 'medium', 'high-risk', 'high', 'very-high', 'very high'" }, value_tier:{ type:"string", description:"Value tier. Examples: 'low-value', 'low', 'medium-value', 'med', 'high-value', 'high'" } } } },
   {
     name:"rag_search",
     description:"Search the ChurnIQ telco churn expert knowledge base. Returns relevant passages with citations from sections: finance, network-economics, pricing-elasticity, lifecycle, modeling, ops, geo.",
