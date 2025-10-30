@@ -67,6 +67,12 @@ export async function askCopilot({ text }: { text: string }): Promise<Answer> {
   });
 
   try {
+    // HYBRID PATH: Questions that need both data visualization AND conceptual context
+    if (score.isHybrid) {
+      console.log("→ Routing to HYBRID (data + context)");
+      return await handleHybridPath(text);
+    }
+
     // RAG PATH: Conceptual/strategic questions
     if (score.preferRag) {
       console.log("→ Routing to RAG (conceptual query)");
@@ -143,6 +149,95 @@ async function handleRAGPath(text: string): Promise<Answer> {
 
   AnswerSchema.parse(answer);
   return answer;
+}
+
+/**
+ * Handle hybrid path: both data visualization AND conceptual explanation
+ * E.g., "Show me customer risk distribution" → chart + RAG context about risk
+ */
+async function handleHybridPath(text: string): Promise<Answer> {
+  console.log("🔀 handleHybridPath called for:", text);
+
+  try {
+    // Run both paths in parallel for efficiency
+    const [numericAnswer, ragResult] = await Promise.all([
+      handleNumericPath(text).catch(err => {
+        console.warn("⚠️ Numeric path failed in hybrid:", err.message);
+        return null;
+      }),
+      Tools.rag_search({
+        query: text,
+        top_k: Number(import.meta.env.VITE_RAG_TOP_K) || 6,
+      }).catch(err => {
+        console.warn("⚠️ RAG search failed in hybrid:", err.message);
+        return null;
+      })
+    ]);
+
+    // If both failed, throw to trigger fallback
+    if (!numericAnswer && !ragResult) {
+      throw new Error("Both numeric and RAG paths failed");
+    }
+
+    // Merge results
+    const chart = numericAnswer?.chart;
+    const numericCitations = numericAnswer?.citations || [];
+
+    // Get RAG context and citations
+    let ragText = "";
+    let ragCitations: Array<{ source: string; ref: string }> = [];
+
+    if (ragResult && ragResult.text && ragResult.text.trim()) {
+      ragText = ragResult.text;
+      ragCitations = (ragResult.citations || []).map((c) => ({
+        source: c.source,
+        ref: c.ref,
+      }));
+    }
+
+    // Compose hybrid answer: chart description + conceptual context
+    let text = "";
+    if (numericAnswer) {
+      text = numericAnswer.text;
+    }
+
+    if (ragText) {
+      // Extract just the first chunk of RAG context (don't overwhelm with full context)
+      const ragSummary = ragText.split(/\n---\n/)[0].trim();
+      if (ragSummary) {
+        text += (text ? "\n\n" : "") + ragSummary;
+      }
+    }
+
+    // Fallback if no text generated
+    if (!text || !text.trim()) {
+      text = "Here are the insights based on your data.";
+    }
+
+    // Merge citations (numeric + RAG)
+    const allCitations = [...numericCitations, ...ragCitations];
+    const uniqueCitations = Array.from(
+      new Map(allCitations.map(c => [c.source, c])).values()
+    );
+
+    const answer: Answer = {
+      text,
+      citations: uniqueCitations.length > 0 ? uniqueCitations : [{ source: "System", ref: "Hybrid analysis" }],
+      chart,
+      followUps: [
+        "Compare ROI across all strategies",
+        "Explain churn economics",
+        "What drives customer risk?",
+      ].slice(0, 3),
+    };
+
+    Telemetry.route("HYBRID", { query: text, hadChart: !!chart, hadRAG: !!ragText });
+    AnswerSchema.parse(answer);
+    return answer;
+  } catch (error: any) {
+    console.error("❌ Hybrid path failed:", error.message);
+    throw error; // Let main copilot handle fallback
+  }
 }
 
 /**

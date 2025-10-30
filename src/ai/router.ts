@@ -3,12 +3,13 @@
  * Prevents silent fallbacks and prioritizes RAG for conceptual questions
  */
 
-export type Route = "rag" | "numeric" | "generic";
+export type Route = "rag" | "numeric" | "hybrid" | "generic";
 
 export interface RouteScore {
   rag: number;
   numeric: number;
   preferRag: boolean;
+  isHybrid: boolean;  // True if query wants both data AND explanation
 }
 
 /**
@@ -84,7 +85,14 @@ export function scoreRoute(query: string): RouteScore {
   // RAG wins on ties (default to knowledge base for ambiguous queries)
   const preferRag = ragScore >= numericScore;
 
-  return { rag: ragScore, numeric: numericScore, preferRag };
+  // Detect hybrid queries: wants data visualization + conceptual explanation
+  // E.g., "Show me customer risk distribution" (wants chart + context about risk)
+  const visualizationKeywords = ["show", "chart", "graph", "plot", "visualiz", "distribution"];
+  const hasVisualization = visualizationKeywords.some(kw => s.includes(kw));
+  const hasDataTopic = numericScore > 0;  // Mentions specific metrics/data
+  const isHybrid = hasVisualization && hasDataTopic && s.split(/\s+/).length >= 4;
+
+  return { rag: ragScore, numeric: numericScore, preferRag, isHybrid };
 }
 
 /**
@@ -92,6 +100,11 @@ export function scoreRoute(query: string): RouteScore {
  */
 export function getRoute(query: string): Route {
   const score = scoreRoute(query);
+
+  // Hybrid route: needs both data visualization AND conceptual context
+  if (score.isHybrid) {
+    return "hybrid";
+  }
 
   if (score.preferRag) {
     return "rag";
