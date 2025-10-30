@@ -85,7 +85,28 @@ export function scoreRoute(query: string): RouteScore {
     "tenure",
     "annual",
     "yearly",
+    "early-tenure",
+    "early tenure",
   ];
+
+  // MANDATORY numeric keywords: if present, ALWAYS route to numeric regardless of conceptual phrasing
+  const mandatoryNumericKeywords = [
+    "month-to-month",
+    "mtm",
+    "m2m",
+    "tenure",
+    "contract",
+    "segment",
+    "roi",
+    "arpu",
+    "cltv",
+    "drivers",
+    "feature importance",
+    "risk distribution",
+  ];
+
+  // Check if query contains any mandatory numeric keywords
+  const hasMandatoryNumeric = mandatoryNumericKeywords.some(kw => s.includes(kw));
 
   // Score based on keyword matches
   const ragScore =
@@ -97,8 +118,8 @@ export function scoreRoute(query: string): RouteScore {
     return total + (s.includes(keyword) ? 1 : 0);
   }, 0);
 
-  // RAG wins on ties (default to knowledge base for ambiguous queries)
-  const preferRag = ragScore >= numericScore;
+  // FORCE numeric routing if mandatory keyword present, otherwise RAG wins on ties
+  const preferRag = hasMandatoryNumeric ? false : ragScore >= numericScore;
 
   // Detect hybrid queries: wants data visualization + conceptual explanation
   // E.g., "Show me customer risk distribution" (wants chart + context about risk)
