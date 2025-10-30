@@ -18,6 +18,17 @@ export interface RouteScore {
 export function scoreRoute(query: string): RouteScore {
   const s = query.toLowerCase();
 
+  // Strong conceptual phrases that MUST use RAG (definitions, explanations)
+  const strongConceptualPhrases = [
+    "what is",
+    "define",
+    "explain",
+    "describe",
+    "how does",
+    "why does",
+    "why is"
+  ];
+
   // Conceptual/strategic keywords that indicate RAG should be used
   const conceptualHints = [
     "what is",
@@ -108,6 +119,9 @@ export function scoreRoute(query: string): RouteScore {
   // Check if query contains any mandatory numeric keywords
   const hasMandatoryNumeric = mandatoryNumericKeywords.some(kw => s.includes(kw));
 
+  // Check if query has strong conceptual intent (definitions, explanations)
+  const hasStrongConceptualIntent = strongConceptualPhrases.some(phrase => s.includes(phrase));
+
   // Score based on keyword matches
   const ragScore =
     conceptualHints.reduce((total, keyword) => {
@@ -118,15 +132,28 @@ export function scoreRoute(query: string): RouteScore {
     return total + (s.includes(keyword) ? 1 : 0);
   }, 0);
 
-  // FORCE numeric routing if mandatory keyword present, otherwise RAG wins on ties
-  const preferRag = hasMandatoryNumeric ? false : ragScore >= numericScore;
+  // ROUTING PRIORITY:
+  // 1. Strong conceptual intent (what is, define, explain) → FORCE RAG
+  // 2. Mandatory numeric keywords → FORCE NUMERIC
+  // 3. Ties → default to RAG
+  const preferRag = hasStrongConceptualIntent ? true :
+                    hasMandatoryNumeric ? false :
+                    ragScore >= numericScore;
 
   // Detect hybrid queries: wants data visualization + conceptual explanation
   // E.g., "Show me customer risk distribution" (wants chart + context about risk)
+  // Also: Exploratory queries like "Tell me about X" where X is a data topic
   const visualizationKeywords = ["show", "chart", "graph", "plot", "visualiz", "distribution"];
+  const exploratoryPhrases = ["tell me about", "why is", "why does", "what about"];
+
   const hasVisualization = visualizationKeywords.some(kw => s.includes(kw));
+  const hasExploratory = exploratoryPhrases.some(phrase => s.includes(phrase));
   const hasDataTopic = numericScore > 0;  // Mentions specific metrics/data
-  const isHybrid = hasVisualization && hasDataTopic && s.split(/\s+/).length >= 4;
+
+  // Hybrid if: (viz + data) OR (exploratory + data)
+  const isHybrid = hasDataTopic &&
+                   (hasVisualization || hasExploratory) &&
+                   s.split(/\s+/).length >= 4;
 
   return { rag: ragScore, numeric: numericScore, preferRag, isHybrid };
 }
