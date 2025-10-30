@@ -144,6 +144,66 @@ export const Tools = {
     };
   },
 
+  get_segment_analysis({ contract_type, tenure_band }: { contract_type?: string; tenure_band?: string } = {}): ToolResult {
+    let segments = AppData?.segments || [];
+
+    // Filter by contract type if specified
+    if (contract_type) {
+      const normalized = contract_type.toLowerCase();
+      if (normalized.includes('month') || normalized.includes('mtm') || normalized.includes('m2m')) {
+        segments = segments.filter((s:any) => s.contract_group === 'Month-to-Month');
+      } else if (normalized.includes('year') || normalized.includes('annual')) {
+        segments = segments.filter((s:any) => s.contract_group !== 'Month-to-Month');
+      }
+    }
+
+    // Filter by tenure if specified
+    if (tenure_band) {
+      segments = segments.filter((s:any) => s.tenure_band === tenure_band);
+    }
+
+    if (segments.length === 0) {
+      return {
+        text: "No segments found matching your criteria.",
+        citations: [{ source: "ExecutiveDashboard", ref: "Segment analysis" }]
+      };
+    }
+
+    // Calculate aggregate statistics
+    const totalCustomers = segments.reduce((sum:number, s:any) => sum + s.customers, 0);
+    const avgChurn = segments.reduce((sum:number, s:any) => sum + (s.churn_probability * s.customers), 0) / totalCustomers;
+    const avgLTV = segments.reduce((sum:number, s:any) => sum + (s.avg_ltv * s.customers), 0) / totalCustomers;
+
+    const table = segments.map((s:any) => ({
+      tenure: s.tenure_band,
+      contract: s.contract_group,
+      customers: s.customers,
+      churnProbability: s.churn_probability,
+      avgLTV: s.avg_ltv,
+      riskLevel: s.risk_level
+    }));
+
+    // Generate chart showing customer distribution
+    const chart = {
+      kind: "bar",
+      title: contract_type ? `${contract_type} Customer Distribution by Tenure` : "Customer Segment Distribution",
+      xLabel: "Tenure Band",
+      yLabel: "Customers",
+      series: [{
+        name: "Customers",
+        data: table.map(r => ({ x: r.tenure, y: r.customers }))
+      }]
+    };
+
+    const contractLabel = contract_type || "selected";
+    return {
+      table,
+      chart,
+      text: `${contractLabel} customers: ${totalCustomers.toLocaleString()} total, ${pct(avgChurn)} avg churn probability, ${money(avgLTV)} avg LTV across ${segments.length} segment(s).`,
+      citations: [{ source: "ExecutiveDashboard", ref: "Segment analysis" }]
+    };
+  },
+
   async rag_search({ query, section_ids, tags, top_k }: {
     query: string;
     section_ids?: string[];
@@ -189,6 +249,7 @@ export const toolSpecs = [
   { name:"get_roi_by_strategy", description:"Return ROI percentage by retention strategy", parameters:{} },
   { name:"compute_arpu_impact", description:"Calculate ARPU impact from churn reduction", parameters:{ type:"object", properties:{ churnDeltaPct:{ type:"number", description:"Percentage churn reduction" } }, required:["churnDeltaPct"] } },
   { name:"compute_cltv", description:"Compute customer lifetime value from financials", parameters:{} },
+  { name:"get_segment_analysis", description:"Analyze customer segments by contract type (month-to-month, annual) and/or tenure band", parameters:{ type:"object", properties:{ contract_type:{ type:"string", description:"Contract type filter: 'month-to-month', 'MTM', 'annual', 'yearly'" }, tenure_band:{ type:"string", description:"Tenure band filter: '0-3 Months', '4-12 Months', etc." } } } },
   {
     name:"rag_search",
     description:"Search the ChurnIQ telco churn expert knowledge base. Returns relevant passages with citations from sections: finance, network-economics, pricing-elasticity, lifecycle, modeling, ops, geo.",

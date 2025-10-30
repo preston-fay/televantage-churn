@@ -76,6 +76,15 @@ export function scoreRoute(query: string): RouteScore {
     "factors",
     "importance",
     "top",
+    "month-to-month",
+    "mtm",
+    "m2m",
+    "segment",
+    "segments",
+    "contract",
+    "tenure",
+    "annual",
+    "yearly",
   ];
 
   // Score based on keyword matches

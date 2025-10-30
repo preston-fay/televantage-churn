@@ -21,6 +21,8 @@ function stripMarkdown(text: string): string {
     // Remove list markers (-, *, 1., etc.)
     .replace(/^[\s]*[-*+]\s+/gm, '')
     .replace(/^[\s]*\d+\.\s+/gm, '')
+    // Remove escaped characters (backslashes)
+    .replace(/\\(.)/g, '$1')
     // Clean up extra whitespace
     .replace(/\n{3,}/g, '\n\n')
     .trim();
