@@ -1,8 +1,8 @@
-# ChurnIQ Churn Intelligence Platform - Intake Summary
+# ChurnIQ Intelligence Platform - Intake Summary
 
 **Status:** ✅ READY FOR REVIEW
 **Date:** October 27, 2025
-**Project Location:** `/Users/pfay01/Projects/churniq-churn-demo`
+**Project Location:** `/Users/pfay01/Projects/churniq-demo`
 
 ---
 
@@ -211,7 +211,7 @@
 ## Next Steps
 
 1. **Review intake.yaml** - Validate specifications with stakeholders
-2. **Start orchestrator workflow:** `cd ~/Projects/churniq-churn-demo && orchestrator run start --intake intake.yaml`
+2. **Start orchestrator workflow:** `cd ~/Projects/churniq-demo && orchestrator run start --intake intake.yaml`
 3. **Planning Phase:** Architect agent designs system architecture
 4. **Development Phase:** Developer agent implements 5 tabs + 7 charts
 5. **QA Phase:** QA agent validates functionality and design
@@ -233,7 +233,7 @@
 **To start the workflow:**
 
 ```bash
-cd ~/Projects/churniq-churn-demo
+cd ~/Projects/churniq-demo
 orchestrator run start --intake intake.yaml
 ```
 

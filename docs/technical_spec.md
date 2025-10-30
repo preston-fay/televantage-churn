@@ -1,4 +1,4 @@
-# ChurnIQ Churn Intelligence Platform - Technical Specification
+# ChurnIQ Intelligence Platform - Technical Specification
 
 **Version:** 1.0
 **Date:** October 27, 2025
@@ -987,6 +987,6 @@ describe('calculateContractConversion', () => {
 
 ## Conclusion
 
-This technical specification provides comprehensive implementation details for the ChurnIQ Churn Intelligence Platform. All components, charts, calculations, and data structures are fully specified and ready for development.
+This technical specification provides comprehensive implementation details for the ChurnIQ Intelligence Platform. All components, charts, calculations, and data structures are fully specified and ready for development.
 
 **Next Phase:** Data Engineering (Generate scaled demo data)

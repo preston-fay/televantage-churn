@@ -1,5 +1,5 @@
 project:
-  name: ChurnIQ Churn Intelligence Platform
+  name: ChurnIQ Intelligence Platform
   type: webapp
   description: |
     Executive demo application showcasing AI-powered churn prediction and retention

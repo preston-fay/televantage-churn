@@ -1,4 +1,4 @@
-# ChurnIQ Churn Intelligence Platform - Data Generation
+# ChurnIQ Intelligence Platform - Data Generation
 
 **Version:** 1.0
 **Date:** October 27, 2025
@@ -406,7 +406,7 @@ const totalHighRiskM2M = highRiskM2M.reduce((sum, s) => sum + s.customers, 0);
 To regenerate demo data (e.g., after source data updates):
 
 ```bash
-cd ~/Projects/churniq-churn-demo
+cd ~/Projects/churniq-demo
 python3 scripts/generate_demo_data.py
 ```
 

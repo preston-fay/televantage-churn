@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy ChurnIQ Churn Demo to AWS Amplify
+# Deploy ChurnIQ Demo to AWS Amplify
 # Usage: ./deploy-to-amplify.sh
 
 set -euo pipefail

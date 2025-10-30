@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ChurnIQ Churn Intelligence Platform - Demo Data Generator
+ChurnIQ Intelligence Platform - Demo Data Generator
 
 This script scales real churn analysis results from the telco-churn_v2 project
 (7,044 customers) to enterprise scale (47.3M customers) with a 6,714x scale factor.

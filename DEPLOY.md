@@ -1,4 +1,4 @@
-# Deployment Guide: ChurnIQ Churn Intelligence Platform
+# Deployment Guide: ChurnIQ Intelligence Platform
 
 This guide covers deployment to AWS Amplify for the existing app at `d1p7obkrs6acpc.amplifyapp.com`.
 

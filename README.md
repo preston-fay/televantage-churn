@@ -1,4 +1,4 @@
-# ChurnIQ Churn Intelligence Platform
+# ChurnIQ Intelligence Platform
 Full-stack web application template
 
 ## Tech Stack
