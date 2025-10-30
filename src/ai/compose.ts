@@ -49,7 +49,7 @@ export function composeGroundedAnswer(
 
   // Build answer text
   const summaryText = summarize(context);
-  const text = `Based on the Telco Churn Expert corpus:\n\n${summaryText}\n\n${citeStr}`;
+  const text = summaryText;
 
   // Format citations for Answer schema (ensure at least one citation)
   const formattedCitations = uniqueCitations.length > 0
