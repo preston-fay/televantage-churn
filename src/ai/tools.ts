@@ -151,20 +151,36 @@ export const Tools = {
     if (contract_type) {
       const normalized = contract_type.toLowerCase();
       if (normalized.includes('month') || normalized.includes('mtm') || normalized.includes('m2m')) {
-        segments = segments.filter((s:any) => s.contract_group === 'Month-to-Month');
-      } else if (normalized.includes('year') || normalized.includes('annual')) {
-        segments = segments.filter((s:any) => s.contract_group !== 'Month-to-Month');
+        segments = segments.filter((s:any) => s.contract_group === 'M2M');
+      } else if (normalized.includes('year') || normalized.includes('annual') || normalized.includes('1yr') || normalized.includes('2yr')) {
+        segments = segments.filter((s:any) => s.contract_group === '1yr' || s.contract_group === '2yr');
       }
     }
 
-    // Filter by tenure if specified
+    // Filter by tenure if specified - be flexible with matching
     if (tenure_band) {
-      segments = segments.filter((s:any) => s.tenure_band === tenure_band);
+      const normalized = tenure_band.toLowerCase();
+      // Map common tenure phrases to actual data values
+      let targetTenure = normalized;
+
+      if (normalized.includes('early') || normalized.includes('new') || normalized.includes('0-3')) {
+        targetTenure = '0-3m';
+      } else if (normalized.includes('4-12') || normalized.includes('4 to 12') || normalized.includes('young')) {
+        targetTenure = '4-12m';
+      } else if (normalized.includes('13-24') || normalized.includes('13 to 24') || normalized.includes('mid')) {
+        targetTenure = '13-24m';
+      } else if (normalized.includes('25-48') || normalized.includes('25 to 48') || normalized.includes('mature')) {
+        targetTenure = '25-48m';
+      } else if (normalized.includes('49-72') || normalized.includes('49 to 72') || normalized.includes('long') || normalized.includes('established')) {
+        targetTenure = '49-72m';
+      }
+
+      segments = segments.filter((s:any) => s.tenure_band === targetTenure);
     }
 
     if (segments.length === 0) {
       return {
-        text: "No segments found matching your criteria.",
+        text: `No segments found matching criteria: ${contract_type || 'all contracts'}, ${tenure_band || 'all tenure bands'}. Available tenure bands: 0-3m, 4-12m, 13-24m, 25-48m, 49-72m. Available contracts: M2M, 1yr, 2yr.`,
         citations: [{ source: "ExecutiveDashboard", ref: "Segment analysis" }]
       };
     }
@@ -173,6 +189,36 @@ export const Tools = {
     const totalCustomers = segments.reduce((sum:number, s:any) => sum + s.customers, 0);
     const avgChurn = segments.reduce((sum:number, s:any) => sum + (s.churn_probability * s.customers), 0) / totalCustomers;
     const avgLTV = segments.reduce((sum:number, s:any) => sum + (s.avg_ltv * s.customers), 0) / totalCustomers;
+
+    // Group by tenure for better visualization if no tenure filter specified
+    let groupedData = segments;
+    if (!tenure_band && segments.length > 10) {
+      // Group by tenure_band for summary view
+      const tenureGroups = segments.reduce((acc:any, s:any) => {
+        if (!acc[s.tenure_band]) {
+          acc[s.tenure_band] = {
+            tenure_band: s.tenure_band,
+            customers: 0,
+            totalChurnWeighted: 0,
+            totalLtvWeighted: 0,
+            segments: []
+          };
+        }
+        acc[s.tenure_band].customers += s.customers;
+        acc[s.tenure_band].totalChurnWeighted += s.churn_probability * s.customers;
+        acc[s.tenure_band].totalLtvWeighted += s.avg_ltv * s.customers;
+        acc[s.tenure_band].segments.push(s);
+        return acc;
+      }, {});
+
+      groupedData = Object.values(tenureGroups).map((g:any) => ({
+        tenure_band: g.tenure_band,
+        customers: g.customers,
+        churn_probability: g.totalChurnWeighted / g.customers,
+        avg_ltv: g.totalLtvWeighted / g.customers,
+        risk_level: g.segments[0].risk_level  // Take first
+      }));
+    }
 
     const table = segments.map((s:any) => ({
       tenure: s.tenure_band,
@@ -183,7 +229,12 @@ export const Tools = {
       riskLevel: s.risk_level
     }));
 
-    // Generate chart showing customer distribution
+    // Generate chart showing customer distribution (use grouped data if available)
+    const chartData = groupedData.map((s:any) => ({
+      x: s.tenure_band || s.tenure,
+      y: s.customers
+    }));
+
     const chart = {
       kind: "bar",
       title: contract_type ? `${contract_type} Customer Distribution by Tenure` : "Customer Segment Distribution",
@@ -191,7 +242,7 @@ export const Tools = {
       yLabel: "Customers",
       series: [{
         name: "Customers",
-        data: table.map(r => ({ x: r.tenure, y: r.customers }))
+        data: chartData
       }]
     };
 
