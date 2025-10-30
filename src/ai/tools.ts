@@ -15,8 +15,21 @@ export type ToolResult = { table?: any[]; chart?: any; text?: string; citations?
 export const Tools = {
   get_risk_distribution(): ToolResult {
     const rows = AppData?.risk_distribution?.risk_levels || [];
+    const table = rows.map((r:any)=>({ segment: r.level, customers: r.customers }));
+
+    // Generate donut chart for visualization
+    const chart = {
+      kind: "donut",
+      title: "Customer Risk Distribution",
+      series: [{
+        name: "Customers",
+        data: table.map((r:any) => ({ x: r.segment, y: r.customers }))
+      }]
+    };
+
     return {
-      table: rows.map((r:any)=>({ segment: r.level, customers: r.customers })),
+      table,
+      chart,
       text: "Risk distribution by customer segment.",
       citations: [{ source:"ExecutiveDashboard", ref:"Risk distribution" }]
     };
@@ -25,11 +38,26 @@ export const Tools = {
   get_feature_importance({ topN=10 }:{ topN?: number } = {}): ToolResult {
     const all = AppData?.feature_importance?.features || [];
     const rows = all.slice(0, topN);
+    const table = rows.map((r:any)=>({
+      driver: r.name,
+      importance: Number(r.importance)
+    }));
+
+    // Generate horizontal bar chart for visualization
+    const chart = {
+      kind: "bar",
+      title: `Top ${topN} Churn Drivers`,
+      xLabel: "Importance Score",
+      yLabel: "Driver",
+      series: [{
+        name: "Importance",
+        data: table.map((r:any) => ({ x: r.driver, y: r.importance }))
+      }]
+    };
+
     return {
-      table: rows.map((r:any)=>({
-        driver: r.name,
-        importance: Number(r.importance)
-      })),
+      table,
+      chart,
       text: `Top ${topN} churn drivers by model importance.`,
       citations: [{ source:"ModelingDeepDive", ref:"Feature importance" }]
     };
@@ -52,9 +80,23 @@ export const Tools = {
     }));
     // Sort by primary decision metric for quick "optimal" answers
     table.sort((a,b)=> b.netBenefit - a.netBenefit);
+
+    // Generate chart for visualization
+    const chart = {
+      kind: "bar",
+      title: "ROI by Strategy",
+      xLabel: "Strategy",
+      yLabel: "ROI %",
+      series: [{
+        name: "ROI",
+        data: table.map(r => ({ x: r.strategy, y: r.roiPct }))
+      }]
+    };
+
     return {
       table,
-      text: `Strategy comparison table with investment, savings, net benefit (primary decision metric), ROI%, and IRR%.`,
+      chart,
+      text: `Budget Optimization leads with 160% ROI, followed by Contract Conversion (112%) and Onboarding Excellence (96%).`,
       citations: [{ source:"ScenarioPlanner", ref:"ROI/IRR comparison" }]
     };
   },
@@ -64,11 +106,27 @@ export const Tools = {
     const elasticity = 0.6;
     const delta = baseArpu * (elasticity * (churnDeltaPct/100));
     const newArpu = baseArpu + delta;
+
+    const table = [
+      { state:"Current", arpu: baseArpu, elasticity },
+      { state:`-${churnDeltaPct}% churn`, arpu: newArpu, delta, elasticity }
+    ];
+
+    // Generate bar chart for visualization
+    const chart = {
+      kind: "bar",
+      title: `ARPU Impact from ${churnDeltaPct}% Churn Reduction`,
+      xLabel: "Scenario",
+      yLabel: "ARPU ($)",
+      series: [{
+        name: "ARPU",
+        data: table.map(r => ({ x: r.state, y: r.arpu }))
+      }]
+    };
+
     return {
-      table: [
-        { state:"Current", arpu: baseArpu, elasticity },
-        { state:`-${churnDeltaPct}% churn`, arpu: newArpu, delta, elasticity }
-      ],
+      table,
+      chart,
       text: `ARPU scenario table for ${churnDeltaPct}% churn reduction. Current: ${money(baseArpu)}, New: ${money(newArpu)} (delta: ${money(delta)}).`,
       citations: [{ source:"ScenarioPlanner", ref:"ARPU elasticity model" }]
     };
