@@ -211,10 +211,16 @@ async function handleHybridPath(text: string): Promise<Answer> {
 
     if (ragResult && ragResult.text && ragResult.text.trim()) {
       ragText = ragResult.text;
-      ragCitations = (ragResult.citations || []).map((c) => ({
-        source: c.source,
-        ref: c.ref,
-      }));
+
+      // Filter out "No relevant context found" message - don't show to user
+      if (ragText === 'No relevant context found.' || ragText.includes('No relevant context found')) {
+        ragText = '';
+      } else {
+        ragCitations = (ragResult.citations || []).map((c) => ({
+          source: c.source,
+          ref: c.ref,
+        }));
+      }
     }
 
     // Compose hybrid answer: chart description + conceptual context

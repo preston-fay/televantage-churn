@@ -70,6 +70,12 @@ export function scoreRoute(query: string): RouteScore {
     "what is the",
     "get",
     "fetch",
+    "feature importance",
+    "drivers",
+    "churn drivers",
+    "factors",
+    "importance",
+    "top",
   ];
 
   // Score based on keyword matches

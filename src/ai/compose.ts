@@ -87,21 +87,10 @@ export function composeGroundedAnswer(
   // Generate context-aware follow-ups
   const followUps = generateFollowUps(citations);
 
-  // If user didn't ask for a chart, return text only
-  if (!wantsChart) {
-    return {
-      text,
-      citations: formattedCitations,
-      followUps,
-    };
-  }
-
-  // If they asked for a chart, we'd need to parse the context
-  // For now, return text with a note that charts require numeric tools
+  // Return answer with citations and follow-ups
+  // Note: Chart detection removed - hybrid path handles charts separately
   return {
-    text:
-      text +
-      "\n\nNote: For charts and visualizations, try asking specific numeric questions like 'Compare ROI by strategy' or 'Show risk distribution'.",
+    text,
     citations: formattedCitations,
     followUps,
   };
